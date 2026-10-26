@@ -11,7 +11,12 @@ import {
   SearchOutlined,
   UserOutlined,
 } from '@ant-design/icons';
+import AccessLogsPage from './pages/access-logs/AccessLogsPage.jsx';
+import AppointmentsPage from './pages/appointments/AppointmentsPage.jsx';
+import DbLabPage from './pages/db-lab/DbLabPage.jsx';
 import DepartmentsPage from './pages/departments/DepartmentsPage.jsx';
+import VisitsPage from './pages/visits/VisitsPage.jsx';
+import VitalsPage from './pages/vitals/VitalsPage.jsx';
 
 /**
  * Sidebar menu + routes. Items without `element` render a placeholder that shows owner/step.
@@ -43,6 +48,7 @@ export const navItems = [
     fr: 'FR3',
     owner: 'Hoàng',
     step: 'S3.3',
+    element: <AppointmentsPage />,
   },
   {
     path: '/visits',
@@ -51,6 +57,7 @@ export const navItems = [
     fr: 'FR4 · FR6',
     owner: 'Hoàng',
     step: 'S3.4, S3.6',
+    element: <VisitsPage />,
   },
   {
     path: '/vitals',
@@ -59,6 +66,7 @@ export const navItems = [
     fr: 'FR9',
     owner: 'Hoàng',
     step: 'S3.9',
+    element: <VitalsPage />,
   },
   {
     path: '/doctors',
@@ -93,6 +101,7 @@ export const navItems = [
     owner: 'Hoàng',
     step: 'S3.12',
     roles: ['ADMIN'],
+    element: <AccessLogsPage />,
   },
   {
     path: '/db-lab',
@@ -102,5 +111,6 @@ export const navItems = [
     owner: 'Cả 2',
     step: 'S3.10, S3.11',
     roles: ['ADMIN'],
+    element: <DbLabPage />,
   },
 ];

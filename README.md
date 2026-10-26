@@ -50,7 +50,9 @@ Kiểm tra kết nối DB: http://localhost:4000/api/health
 
 | Lệnh | Tác dụng |
 |---|---|
-| `npm run db:up:cluster` | Thêm 2 node Cassandra (demo consistency/replication) |
+| `npm run test:e2e -w server` | Chạy 14 test API end-to-end (cần 2 DB đang chạy; tạo dữ liệu thật, reset bằng `db:init`) |
+| `node demos/run.js <file.sql\|.cql> [--save]` | Chạy script demo trong container, `--save` ghi output vào `results/` |
+| `npm run db:up:cluster` | Thêm 2 node Cassandra (demo consistency/replication). **Dỡ bằng** `node demos/_common/cluster.js down` |
 | `npm run db:down` | Dừng container (giữ dữ liệu); `docker compose down -v` để xoá sạch |
 | `npm run db:init -- mssql` | Chỉ tạo lại SQL Server (hoặc `cassandra`) |
 | `npm run format` | Format code bằng Prettier |

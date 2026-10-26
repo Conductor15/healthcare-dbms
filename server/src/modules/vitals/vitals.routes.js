@@ -65,6 +65,8 @@ vitalsRouter.get('/:patientId/stream', validate(patientParam, 'params'), (req, r
   const { patientId } = req.valid.params;
   res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive' });
   res.flushHeaders();
+  // send a first chunk right away: proxies (e.g. the Vite dev proxy) hold the headers until body data arrives
+  res.write('retry: 3000\n\n');
   const onReading = (reading) => {
     if (reading.patientId === patientId) res.write(`data: ${JSON.stringify(reading)}\n\n`);
   };

@@ -35,6 +35,26 @@ async function freeSlots(n) {
   throw new Error('no free slots left: run npm run db:init');
 }
 
+/**
+ * Books the first free slot of doctor 1 where `patientId` has no other appointment at the same time
+ * (the API rejects that clash with 409, and other runs/UI tests may have booked the patient elsewhere).
+ */
+async function bookFor(patientId, reason) {
+  for (let offset = 1; offset <= 13; offset++) {
+    const date = clinicDate(new Date(Date.now() + offset * 86_400_000));
+    const { body: slots } = await call('GET', `/slots?doctorId=1&date=${date}`);
+    for (const slot of slots.filter((s) => !s.isBooked)) {
+      const res = await call('POST', '/appointments', {
+        as: 'reception',
+        body: { patientId, slotId: slot.id, reason },
+      });
+      if (res.status === 201) return { ...res, date, slotId: slot.id };
+      if (!/cùng giờ/.test(res.body.error)) return res;
+    }
+  }
+  throw new Error('no free slots left: run npm run db:init');
+}
+
 const stock = async (id) => (await call('GET', '/medicines')).body.find((m) => m.id === id).stock;
 
 before(async () => {
@@ -62,10 +82,8 @@ after(async () => {
 
 describe('FR3 appointments', () => {
   test('book, reject double booking, list, cancel, delete', async () => {
-    const { date, slots } = await freeSlots(1);
-    const slotId = slots[0].id;
-
-    const booked = await call('POST', '/appointments', { as: 'reception', body: { patientId: 3, slotId, reason: 'Sốt' } });
+    const booked = await bookFor(3, 'Sốt');
+    const { date, slotId } = booked;
     assert.equal(booked.status, 201);
     assert.equal(booked.body.status, 'SCHEDULED');
     assert.equal(booked.body.date, date);
@@ -91,7 +109,10 @@ describe('FR3 appointments', () => {
     const { slots } = await freeSlots(1);
     const results = await Promise.all(
       Array.from({ length: 20 }, (_, i) =>
-        call('POST', '/appointments', { as: 'reception', body: { patientId: (i % 10) + 1, slotId: slots[0].id } }),
+        call('POST', '/appointments', {
+          as: 'reception',
+          body: { patientId: (i % 10) + 1, slotId: slots[0].id },
+        }),
       ),
     );
     assert.equal(results.filter((r) => r.status === 201).length, 1);
@@ -99,7 +120,10 @@ describe('FR3 appointments', () => {
   });
 
   test('doctors cannot book; validation errors are 400', async () => {
-    assert.equal((await call('POST', '/appointments', { as: 'doctor1', body: { patientId: 1, slotId: 1 } })).status, 403);
+    assert.equal(
+      (await call('POST', '/appointments', { as: 'doctor1', body: { patientId: 1, slotId: 1 } })).status,
+      403,
+    );
     const bad = await call('POST', '/appointments', { as: 'reception', body: { patientId: 'x' } });
     assert.equal(bad.status, 400);
     assert.ok(bad.body.details.length >= 1);
@@ -108,15 +132,18 @@ describe('FR3 appointments', () => {
   test('past slots cannot be booked', async () => {
     const yesterday = clinicDate(new Date(Date.now() - 86_400_000));
     const slot = (await call('GET', `/slots?doctorId=1&date=${yesterday}`)).body.find((s) => !s.isBooked);
-    const res = await call('POST', '/appointments', { as: 'reception', body: { patientId: 1, slotId: slot.id } });
+    const res = await call('POST', '/appointments', {
+      as: 'reception',
+      body: { patientId: 1, slotId: slot.id },
+    });
     assert.equal(res.status, 400);
   });
 });
 
 describe('FR4 + FR6 visits', () => {
   test('visit from appointment: one transaction writes visit, prescription, stock, invoice', async () => {
-    const { slots } = await freeSlots(1);
-    const appt = await call('POST', '/appointments', { as: 'reception', body: { patientId: 3, slotId: slots[0].id } });
+    const appt = await bookFor(3);
+    assert.equal(appt.status, 201);
     const [paracetamolBefore, cetirizineBefore] = [await stock(1), await stock(8)];
 
     const visit = await call('POST', '/visits', {
@@ -146,7 +173,10 @@ describe('FR4 + FR6 visits', () => {
     assert.equal(detail.body.department.name, 'Nội tổng quát');
     const paid = await call('PATCH', `/invoices/${detail.body.invoice.id}/pay`, { as: 'reception' });
     assert.equal(paid.body.invoice.status, 'PAID');
-    assert.equal((await call('PATCH', `/invoices/${detail.body.invoice.id}/pay`, { as: 'reception' })).status, 409);
+    assert.equal(
+      (await call('PATCH', `/invoices/${detail.body.invoice.id}/pay`, { as: 'reception' })).status,
+      409,
+    );
   });
 
   test('out of stock → 409 and NOTHING is written (atomicity)', async () => {
@@ -211,8 +241,10 @@ describe('FR9 vitals (Cassandra)', () => {
       as: 'doctor1',
       body: { patientId: 4, heartRate: 70, systolicBp: 118, diastolicBp: 76, spo2: 99, temperature: 36.6 },
     });
-    const { value } = await reader.read();
-    const event = JSON.parse(new TextDecoder().decode(value).replace(/^data: /, ''));
+    // the stream opens with "retry: 3000"; read until the first data event
+    let buffer = '';
+    while (!/^data: .*\n\n/m.test(buffer)) buffer += new TextDecoder().decode((await reader.read()).value);
+    const event = JSON.parse(buffer.match(/^data: (.*)$/m)[1]);
     assert.equal(event.patientId, 4);
     controller.abort();
   });
@@ -249,9 +281,13 @@ describe('DB Lab iv-vi', () => {
   });
 
   test('double booking: UPDLOCK lets exactly one through, LWT too', async () => {
-    const locked = await call('POST', '/lab/concurrency/double-booking', { body: { mode: 'mssql-locked', requests: 30 } });
+    const locked = await call('POST', '/lab/concurrency/double-booking', {
+      body: { mode: 'mssql-locked', requests: 30 },
+    });
     assert.equal(locked.body.toldBooked, 1);
-    const lwt = await call('POST', '/lab/concurrency/double-booking', { body: { mode: 'cassandra-lwt', requests: 30 } });
+    const lwt = await call('POST', '/lab/concurrency/double-booking', {
+      body: { mode: 'cassandra-lwt', requests: 30 },
+    });
     assert.equal(lwt.body.toldBooked, 1);
   });
 

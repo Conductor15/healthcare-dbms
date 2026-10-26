@@ -9,11 +9,17 @@ export default function PlaceholderPage({ item }) {
         title={`${item.label}: đang phát triển`}
         subTitle="Trang này chưa được hiện thực. Xem docs/PLAN.md để biết tiến độ."
         extra={
-          <Descriptions bordered size="small" column={1} style={{ maxWidth: 420, margin: '0 auto' }}>
-            <Descriptions.Item label="Chức năng">{item.fr}</Descriptions.Item>
-            <Descriptions.Item label="Phụ trách">{item.owner}</Descriptions.Item>
-            <Descriptions.Item label="Step">{item.step}</Descriptions.Item>
-          </Descriptions>
+          <Descriptions
+            bordered
+            size="small"
+            column={1}
+            style={{ maxWidth: 420, margin: '0 auto' }}
+            items={[
+              { key: 'fr', label: 'Chức năng', children: item.fr },
+              { key: 'owner', label: 'Phụ trách', children: item.owner },
+              { key: 'step', label: 'Step', children: item.step },
+            ]}
+          />
         }
       />
     </Card>

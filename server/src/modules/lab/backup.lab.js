@@ -89,7 +89,7 @@ export async function pointInTimeDemo() {
       return prices(pool);
     });
     const log = await step('3. Backup log (chứa cả sự cố)', () => takeBackup('LOG'));
-    await step(`4. Restore bản sao ${COPY} với STOPAT = ${stopAt}`, () =>
+    await step(`4. Restore bản sao ${COPY} với STOPAT = ${stopAt} (giờ máy chủ, UTC)`, () =>
       run(
         pool,
         `RESTORE DATABASE [${COPY}] FROM DISK = @full
