@@ -1,0 +1,7 @@
+step,node,consistency,result
+"1. Ghi ""none"" khi cả 3 node sống",hc-cassandra,ALL,OK
+"2. Node 3 chết. Ghi ""penicillin"" yêu cầu ALL",hc-cassandra,ALL,"<stdin>:1:NoHostAvailable: ('Unable to complete the operation against any hosts', {<Host: 127.0.0.1:9042 dc1>: Unavailable('Error from server: code=1000 [Unavailable exception] message=""Cannot achieve consistency level ALL"" info={\'consistency\': \'ALL\', \'required_replicas\': 3, \'alive_replicas\': 2}')})"
+"3. Ghi ""penicillin"" với QUORUM (2/3 node đủ)",hc-cassandra,QUORUM,OK
+4. Node 3 sống lại (thiếu bản ghi). Đọc ONE ×5 qua node 3,hc-cassandra3,ONE,"penicillin, penicillin, none, none, none"
+5. Đọc QUORUM qua node 3 (R+W = 2+2 > 3),hc-cassandra3,QUORUM,penicillin
+6. Đọc ONE ×5 lại sau QUORUM (read repair?),hc-cassandra3,ONE,"penicillin, penicillin, penicillin, penicillin, penicillin"

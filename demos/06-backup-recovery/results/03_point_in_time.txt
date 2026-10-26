@@ -1,0 +1,38 @@
+--- 0. Full backup (ví dụ: bản backup đêm qua)
+Processed 896 pages for database 'HealthcareDB', file 'HealthcareDB' on file 1.
+Processed 2 pages for database 'HealthcareDB', file 'HealthcareDB_log' on file 1.
+BACKUP DATABASE successfully processed 898 pages in 0.082 seconds (85.508 MB/sec).
+--- 1. Sáng nay: thay đổi hợp lệ SAU full backup (phải được giữ lại)
+--- 2. Sự cố: UPDATE quên WHERE
+medicine_id name unit_price
+----------- ---- ----------
+1 Paracetamol 500mg .00
+2 Amoxicillin 500mg .00
+3 Ibuprofen 400mg .00
+4 Omeprazole 20mg .00
+--- 3. Backup log (chứa cả thay đổi hợp lệ lẫn sự cố)
+Processed 20 pages for database 'HealthcareDB', file 'HealthcareDB_log' on file 1.
+BACKUP LOG successfully processed 20 pages in 0.015 seconds (10.416 MB/sec).
+--- 4. Restore bản sao HealthcareDB_PITR: full + log, dừng tại thời điểm ngay trước sự cố
+    STOPAT = 2026-10-26 03:35:32.256
+Processed 896 pages for database 'HealthcareDB_PITR', file 'HealthcareDB' on file 1.
+Processed 2 pages for database 'HealthcareDB_PITR', file 'HealthcareDB_log' on file 1.
+RESTORE DATABASE successfully processed 898 pages in 0.057 seconds (123.012 MB/sec).
+Processed 0 pages for database 'HealthcareDB_PITR', file 'HealthcareDB' on file 1.
+Processed 20 pages for database 'HealthcareDB_PITR', file 'HealthcareDB_log' on file 1.
+RESTORE LOG successfully processed 20 pages in 0.024 seconds (6.510 MB/sec).
+--- 5. So sánh live vs bản khôi phục
+medicine_id name live_price restored_price
+----------- ---- ---------- --------------
+1 Paracetamol 500mg .00 1650.00
+2 Amoxicillin 500mg .00 3000.00
+3 Ibuprofen 400mg .00 2500.00
+4 Omeprazole 20mg .00 4000.00
+--- 6. Sửa đúng cột bị hỏng từ bản khôi phục
+    Đã sửa 15 dòng. Paracetamol giữ giá mới 1650 (thay đổi hợp lệ sau full backup):
+medicine_id name unit_price
+----------- ---- ----------
+1 Paracetamol 500mg 1650.00
+2 Amoxicillin 500mg 3000.00
+3 Ibuprofen 400mg 2500.00
+4 Omeprazole 20mg 4000.00

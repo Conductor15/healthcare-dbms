@@ -1,0 +1,18 @@
+Processed 3144 pages for database 'HealthcareDB', file 'HealthcareDB' on file 1.
+Processed 2 pages for database 'HealthcareDB', file 'HealthcareDB_log' on file 1.
+BACKUP DATABASE successfully processed 3146 pages in 0.090 seconds (273.046 MB/sec).
+Processed 104 pages for database 'HealthcareDB', file 'HealthcareDB' on file 1.
+Processed 2 pages for database 'HealthcareDB', file 'HealthcareDB_log' on file 1.
+BACKUP DATABASE WITH DIFFERENTIAL successfully processed 106 pages in 0.078 seconds (10.566 MB/sec).
+Processed 19 pages for database 'HealthcareDB', file 'HealthcareDB_log' on file 1.
+BACKUP LOG successfully processed 19 pages in 0.014 seconds (10.323 MB/sec).
+--- Kiểm tra tính toàn vẹn file backup (đọc lại toàn bộ, so CHECKSUM)
+The backup set on file 1 is valid.
+The backup set on file 1 is valid.
+The backup set on file 1 is valid.
+--- Lịch sử backup trong msdb: chuỗi LSN nối tiếp nhau
+kind name finished first_lsn last_lsn based_on_full_lsn size_mb compressed_mb checksum file
+---- ---- -------- --------- -------- ----------------- ------- ------------- -------- ----
+LOG T6 log 1 2026-10-26 03:35:30 55000002475200001 55000002504800001 55000002488800001 .21 .03 1 /var/opt/mssql/backup/hc_log1.trn
+DIFF T6 differential 2026-10-26 03:35:30 55000002501600001 55000002504000001 55000002488800001 2.09 .10 1 /var/opt/mssql/backup/hc_diff.bak
+FULL T6 full 2026-10-26 03:35:30 55000002488800001 55000002491200001 54000000688800001 26.09 1.06 1 /var/opt/mssql/backup/hc_full.bak

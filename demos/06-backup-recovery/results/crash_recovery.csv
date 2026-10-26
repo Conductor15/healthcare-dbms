@@ -1,0 +1,11 @@
+dbms,step,value
+SQL Server,"trước crash, đọc NOLOCK qty",0
+SQL Server,"sau restart, qty (UNDO)",100
+SQL Server,"sau restart, lab_crash (REDO)",committed after checkpoint
+SQL Server,errorlog,2 transactions rolled forward in database 'HealthcareDB' (5:0). This is an informational message only. No user action is required.
+SQL Server,errorlog,1 transactions rolled back in database 'HealthcareDB' (5:0). This is an informational message only. No user action is required.
+SQL Server,errorlog,Recovery is writing a checkpoint in database 'HealthcareDB' (5). This is an informational message only. No user action is required.
+Cassandra,"trước crash: 500 dòng đã ack, số SSTable trên đĩa",0
+Cassandra,"sau restart, COUNT(*)",500
+Cassandra,log,"- Replaying /opt/cassandra/data/commitlog/CommitLog-7-1792986613680.log, /opt/cassandra/data/commitlog/CommitLog-7-1792986613681.log"
+Cassandra,log,"- Log replay complete, 662 replayed mutations in 1280 ms"

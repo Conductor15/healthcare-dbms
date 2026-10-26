@@ -1,18 +1,14 @@
 // Step S1.6: shared measurement harness so all 6 topics report numbers the same way.
 // Usage: see demos/_common/README.md and demos/_common/example.js
+import './env.js'; // must stay first: config.js reads process.env on load
 import cassandra from 'cassandra-driver';
 import sql from 'mssql';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
+import { config } from '../../server/src/config.js';
 
 const REPO_ROOT = path.resolve(import.meta.dirname, '../..');
-try {
-  process.loadEnvFile(path.join(REPO_ROOT, '.env'));
-} catch {
-  // no .env: fall back to defaults / real environment
-}
-const { config } = await import('../../server/src/config.js');
 
 export { sql };
 export const { types } = cassandra;

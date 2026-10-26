@@ -1,0 +1,26 @@
+anomaly,level,occurs,how
+Dirty read,READ UNCOMMITTED,true,đọc được 999 chưa commit
+Dirty read,READ COMMITTED,false,bị chặn (lock timeout 1222)
+Dirty read,REPEATABLE READ,false,bị chặn (lock timeout 1222)
+Dirty read,SERIALIZABLE,false,bị chặn (lock timeout 1222)
+Dirty read,SNAPSHOT,false,đọc phiên bản đã commit (100)
+Non-repeatable read,READ UNCOMMITTED,true,"lần 1 đọc 100, lần 2 đọc 101"
+Non-repeatable read,READ COMMITTED,true,"lần 1 đọc 100, lần 2 đọc 101"
+Non-repeatable read,REPEATABLE READ,false,writer bị chặn (lock timeout 1222)
+Non-repeatable read,SERIALIZABLE,false,writer bị chặn (lock timeout 1222)
+Non-repeatable read,SNAPSHOT,false,writer commit được nhưng reader vẫn thấy 100
+Phantom read,READ UNCOMMITTED,true,"COUNT lần 1 = 2, lần 2 = 3"
+Phantom read,READ COMMITTED,true,"COUNT lần 1 = 2, lần 2 = 3"
+Phantom read,REPEATABLE READ,true,"COUNT lần 1 = 2, lần 2 = 3"
+Phantom read,SERIALIZABLE,false,INSERT bị chặn (lock timeout 1222)
+Phantom read,SNAPSHOT,false,INSERT commit được nhưng reader không thấy
+Lost update (đọc rồi ghi),READ UNCOMMITTED,true,cả 2 commit nhưng tồn kho = 90 (đúng: 80)
+Lost update (đọc rồi ghi),READ COMMITTED,true,cả 2 commit nhưng tồn kho = 90 (đúng: 80)
+Lost update (đọc rồi ghi),REPEATABLE READ,false,một bên bị chặn (lock timeout 1222) → phải thử lại
+Lost update (đọc rồi ghi),SERIALIZABLE,false,một bên bị chặn (lock timeout 1222) → phải thử lại
+Lost update (đọc rồi ghi),SNAPSHOT,false,một bên snapshot update conflict (3960) → phải thử lại
+Lost update (UPDATE qty = qty - 10),READ UNCOMMITTED,false,"cả 2 commit, tồn kho = 80"
+Lost update (UPDATE qty = qty - 10),READ COMMITTED,false,"cả 2 commit, tồn kho = 80"
+Lost update (UPDATE qty = qty - 10),REPEATABLE READ,false,một bên bị chặn (lock timeout 1222) → phải thử lại
+Lost update (UPDATE qty = qty - 10),SERIALIZABLE,false,một bên bị chặn (lock timeout 1222) → phải thử lại
+Lost update (UPDATE qty = qty - 10),SNAPSHOT,false,một bên snapshot update conflict (3960) → phải thử lại
