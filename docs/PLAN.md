@@ -141,7 +141,7 @@ Mỗi topic đi qua 6 bước con giống nhau. Chi tiết kịch bản nằm tr
 | T1 | i. Data storage & management | Dương | 30/10 | 30/10 | 01/11 | 03/11 | 04/11 | 05/11 | ⬜ |
 | T2 | ii. Indexing *(topic chính)* | Dương | 02/11 | 03/11 | 05/11 | 07/11 | 08/11 | 09/11 | ⬜ |
 | T3 | iii. Query processing | Dương | 06/11 | 07/11 | 09/11 | 10/11 | 11/11 | 12/11 | ⬜ |
-| T4 | iv. Transaction *(topic chính)* | Hoàng | 30/10 | 30/10 | 01/11 | 03/11 | 04/11 | 05/11 | ⬜ |
+| T4 | iv. Transaction *(topic chính)* | Hoàng | 30/10 | 30/10 | 01/11 | 03/11 | 04/11 | 05/11 | 🟨 T4.1–T4.5 |
 | T5 | v. Concurrency control | Hoàng | 02/11 | 03/11 | 05/11 | 07/11 | 08/11 | 09/11 | ⬜ |
 | T6 | vi. Data backup & recovery | Hoàng | 06/11 | 07/11 | 09/11 | 10/11 | 11/11 | 12/11 | ⬜ |
 

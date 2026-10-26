@@ -5,7 +5,7 @@
 | i | Data storage & management | Dương | [01-storage](01-storage/) | ⬜ |
 | ii | Indexing *(topic chính của Dương)* | Dương | [02-indexing](02-indexing/) | ⬜ |
 | iii | Query processing | Dương | [03-query-processing](03-query-processing/) | ⬜ |
-| iv | Transaction *(topic chính của Hoàng)* | Hoàng | [04-transaction](04-transaction/) | ⬜ |
+| iv | Transaction *(topic chính của Hoàng)* | Hoàng | [04-transaction](04-transaction/) | 🟨 |
 | v | Concurrency control | Hoàng | [05-concurrency](05-concurrency/) | ⬜ |
 | vi | Data backup & recovery | Hoàng | [06-backup-recovery](06-backup-recovery/) | ⬜ |
 

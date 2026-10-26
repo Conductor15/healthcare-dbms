@@ -1,0 +1,19 @@
+<stdin>:25:SyntaxException: line 1:0 no viable alternative at input 'ROLLBACK' ([ROLLBACK]...)
+
+ patient_id | visit_id | diagnosis
+------------+----------+------------------
+          7 |     1001 | Hen phe quan cap
+
+(1 rows)
+
+ medicine_id | name       | stock
+-------------+------------+-------
+           9 | Salbutamol |    60
+
+(1 rows)
+
+ visit_id | patient_id | total
+----------+------------+-------
+
+
+(0 rows)

@@ -1,0 +1,8 @@
+1. Autocommit (mặc định): mỗi câu lệnh là 1 transaction, tự commit
+   @@TRANCOUNT sau UPDATE = 0
+2. Implicit: câu lệnh đầu tiên tự MỞ transaction, phải COMMIT/ROLLBACK thủ công
+   @@TRANCOUNT sau UPDATE = 1 (đang giữ khoá cho tới khi kết thúc!)
+3. Explicit: BEGIN TRAN ... COMMIT, có thể lồng nhau nhưng chỉ COMMIT ngoài cùng có tác dụng
+   @@TRANCOUNT lồng = 2
+   sau COMMIT trong: @@TRANCOUNT = 1 (chưa có gì được ghi bền)
+   sau ROLLBACK ngoài: @@TRANCOUNT = 0

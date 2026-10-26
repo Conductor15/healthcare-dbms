@@ -1,0 +1,17 @@
+1. INSERT visits            → visit_id = 1
+2. INSERT prescriptions     → prescription_id = 1
+3. INSERT prescription_items → 2 dòng
+4a. UPDATE tồn kho Paracetamol −10 → OK
+!! Lỗi 547 tại bước 4b: The UPDATE statement conflicted with the CHECK constraint "CK_medicines_stock". The conflict occurred in database "HealthcareDB", table "dbo.medicines", column 'stock_quantity'.
+   XACT_STATE() = -1 (−1 = transaction không thể commit)
+=> ROLLBACK: huỷ cả bước 1, 2, 3, 4a
+ 
+Trước / sau: hoàn toàn giống nhau (atomicity)
+state visits prescriptions items invoices paracetamol salbutamol
+----- ------ ------------- ----- -------- ----------- ----------
+before 0 0 0 0 5000 60
+after 0 0 0 0 5000 60
+Lưu ý: IDENTITY không rollback → lần insert visit kế tiếp sẽ nhảy số (gap).
+visits_identity_current
+-----------------------
+1

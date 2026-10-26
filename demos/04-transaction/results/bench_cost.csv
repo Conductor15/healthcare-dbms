@@ -1,0 +1,9 @@
+db,name,total,ok,failed,errors,seconds,opsPerSec,rowsPerSec
+SQL Server,"autocommit, 1 client (1 commit/row)",2000,2000,0,{},13.12,152,152
+SQL Server,"autocommit, 16 clients",2000,2000,0,{},1.68,1194,1194
+SQL Server,"1 transaction for 2000 rows, 1 client",2000,2000,0,{},1.71,1169,1169
+Cassandra,"single INSERT, 1 client",2000,2000,0,{},1.83,1095,1095
+Cassandra,"single INSERT, 16 clients",2000,2000,0,{},0.13,15488,15488
+Cassandra,UNLOGGED batch 50 rows / 1 partition (ok = batches),40,40,0,{},0.07,604,30200
+Cassandra,LOGGED batch 2 rows / 2 partitions (ok = batches),1000,1000,0,{},1.1,906,1812
+Cassandra,"LWT INSERT ... IF NOT EXISTS, 1 client",2000,2000,0,{},3.44,581,581

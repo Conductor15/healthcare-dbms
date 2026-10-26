@@ -1,0 +1,26 @@
+
+ [applied]
+-----------
+      True
+
+ [applied] | medicine_id | name        | stock
+-----------+-------------+-------------+-------
+     False |           1 | Paracetamol |   100
+
+ [applied]
+-----------
+      True
+
+ [applied] | stock
+-----------+-------
+     False |    90
+
+ [applied] | stock
+-----------+-------
+     False |    90
+
+ medicine_id | name        | stock
+-------------+-------------+-------
+           1 | Paracetamol |    90
+
+(1 rows)

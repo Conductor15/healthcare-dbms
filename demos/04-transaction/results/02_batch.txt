@@ -1,0 +1,27 @@
+
+ patient_id | visit_id | diagnosis
+------------+----------+---------------
+          4 |     2001 | Viem hong cap
+
+(1 rows)
+
+ medicine_id | name        | stock
+-------------+-------------+-------
+           1 | Paracetamol |  4990
+
+(1 rows)
+
+ visit_id | patient_id | total
+----------+------------+--------
+     2001 |          4 | 215000
+
+(1 rows)
+<stdin>:31:InvalidRequest: Error from server: code=2200 [Invalid query] message="Invalid operation (stock = stock - 10) for non counter column stock"
+<stdin>:37:InvalidRequest: Error from server: code=2200 [Invalid query] message="Invalid STRING constant (not-a-number) for "total" of type int"
+
+ patient_id | visit_id | diagnosis
+------------+----------+---------------
+          4 |     2001 | Viem hong cap
+
+(1 rows)
+<stdin>:45:InvalidRequest: Error from server: code=2200 [Invalid query] message="Batch with conditions cannot span multiple tables"
