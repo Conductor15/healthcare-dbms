@@ -109,7 +109,7 @@ Mỗi step = 1 GitHub Issue (template "Step") + ≥1 PR. Tên branch chứa step
 | S0.2 | Môi trường Docker | Hoàng | — | `docker-compose.yml`, `.env.example` | `docker compose up -d` → 2 container *healthy* trên cả 2 máy | 27/10 | 🟨 |
 | S0.3 | Quy trình Git & quy ước | Hoàng | — | `CONTRIBUTING.md`, `.github/` (PR/Issue template, CODEOWNERS), branch protection `main` | Rule bật trên GitHub, Dương đọc xong | 27/10 | 🟨 |
 | S0.4 | Skeleton backend + frontend, module mẫu *Khoa phòng*, auth, access log | Hoàng | S1.2 | `server/`, `client/`, module `departments` | Đăng nhập được; CRUD khoa chạy end-to-end; `/api/health` báo 2 DB OK | 28/10 | 🟨 |
-| S0.5 | Họp kickoff + biên bản #1 | Cả 2 | `PLAN.md` | `docs/meetings/2026-10-27-kickoff.md` | Chốt plan, deadline, topic chính, lịch họp | 27/10 | ⬜ |
+| S0.5 | Họp kickoff + biên bản #1 | Cả 2 | `PLAN.md` | `docs/meetings/2026-10-26-kickoff.md` | Chốt plan, deadline, topic chính, lịch họp | 26/10 | ⬜ |
 | S0.6 | Onboard Dương | Dương | `README.md` | PR đầu tiên (ghi TRACKLOG) được merge | App chạy trên máy Dương | 28/10 | ⬜ |
 
 ### Phase 1: Thiết kế
@@ -169,7 +169,7 @@ Mỗi topic đi qua 6 bước con giống nhau. Chi tiết kịch bản nằm tr
 
 | ID | Việc | Owner | Input | Output | Done khi | Hạn | Status |
 |---|---|---|---|---|---|---|---|
-| S4.1 | Checklist kiểm thử E2E: 9 FR × 8 query type | Hoàng | Phase 3 | `docs/testing/checklist.md` | Có cột người test + kết quả | 11/11 | ⬜ |
+| S4.1 | Checklist kiểm thử E2E: 9 FR × 8 query type | Hoàng | Phase 3 | `docs/testing/checklist.md` | Có cột người test + kết quả | 11/11 | 🟨 |
 | S4.2 | **Test chéo**: Dương test FR của Hoàng và ngược lại | Cả 2 | S4.1 | Issue bug gắn nhãn `bug` | Không còn bug mức High | 14/11 | ⬜ |
 | S4.3 | Hoàn thiện UX (empty state, loading, validation, responsive) | Theo owner FR | S4.2 | PR | Checklist UX trong S4.1 pass | 14/11 | ⬜ |
 | S4.4 | Code freeze + tag `v1.0` + hướng dẫn cài đặt | Hoàng | S4.3 | Git tag, `README.md` | Cài mới từ đầu trên máy Dương chạy được | 15/11 | ⬜ |
