@@ -1,4 +1,5 @@
 import { getCassandra, types } from '../db/cassandra.js';
+import { clinicDate } from '../utils/clinic-time.js';
 
 const INSERT = `INSERT INTO access_logs_by_user_day (user_id, day, ts, method, path, status_code, ip)
                 VALUES (?, ?, now(), ?, ?, ?, ?)`;
@@ -12,9 +13,9 @@ export function accessLog(req, res, next) {
     if (!req.user) return;
     const params = [
       req.user.sub,
-      types.LocalDate.fromDate(new Date()),
+      types.LocalDate.fromString(clinicDate()),
       req.method,
-      req.originalUrl,
+      req.originalUrl.replace(/([?&]token=)[^&]*/, '$1***'), // never store SSE tokens
       res.statusCode,
       req.ip,
     ];

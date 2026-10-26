@@ -4,7 +4,9 @@ import { HttpError } from '../utils/http-error.js';
 
 export function authenticate(req, res, next) {
   const header = req.headers.authorization ?? '';
-  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+  // EventSource (SSE) cannot send headers, so only event-stream requests may pass the token in the URL
+  const isEventStream = req.headers.accept === 'text/event-stream';
+  const token = header.startsWith('Bearer ') ? header.slice(7) : isEventStream ? req.query.token : null;
   if (!token) return next(new HttpError(401, 'Bạn chưa đăng nhập'));
   try {
     req.user = jwt.verify(token, config.jwt.secret);

@@ -154,16 +154,16 @@ Mỗi topic đi qua 6 bước con giống nhau. Chi tiết kịch bản nằm tr
 | S3.0 | Đăng nhập + phân quyền (ADMIN / RECEPTIONIST / DOCTOR) | Hoàng | — | SQL Server | S0.4 | `modules/auth`, trang Login | 28/10 | 🟨 |
 | S3.1 | FR1 Quản lý hồ sơ bệnh nhân | Dương | a, b, c, d | SQL Server | S1.5 | `modules/patients`, `pages/patients` | 01/11 | ⬜ |
 | S3.2 | FR2 Quản lý bác sĩ (khoa phòng đã có mẫu) | Dương | a, b, c | SQL Server | S0.4 | `modules/doctors`, `pages/doctors` | 03/11 | ⬜ |
-| S3.3 | FR3 Đặt lịch / huỷ lịch hẹn (**transaction + chống double-booking**) | Hoàng | a, b, c, e | SQL Server | S1.5, T4, T5 | `modules/appointments`, `pages/appointments` | 03/11 | ⬜ |
-| S3.4 | FR4 Khám bệnh + kê đơn + hoá đơn (**transaction nhiều bảng, trừ tồn kho**) | Hoàng | a, c | SQL Server | S3.3 | `modules/visits`, `pages/visits` | 06/11 | ⬜ |
+| S3.3 | FR3 Đặt lịch / huỷ lịch hẹn (**transaction + chống double-booking**) | Hoàng | a, b, c, e | SQL Server | S1.5, T4, T5 | `modules/appointments`, `pages/appointments` | 03/11 | 🟦 API ✅, UI đang làm |
+| S3.4 | FR4 Khám bệnh + kê đơn + hoá đơn (**transaction nhiều bảng, trừ tồn kho**) | Hoàng | a, c | SQL Server | S3.3 | `modules/visits`, `pages/visits` | 06/11 | 🟦 API ✅, UI đang làm |
 | S3.5 | FR5 Tìm kiếm bệnh nhân đa điều kiện | Dương | e | SQL Server | S3.1, T2 | `GET /patients/search`, trang Tra cứu | 05/11 | ⬜ |
-| S3.6 | FR6 Chi tiết lượt khám (join 8 bảng) | Hoàng | f | SQL Server | S3.4 | `GET /visits/:id`, drawer chi tiết | 07/11 | ⬜ |
+| S3.6 | FR6 Chi tiết lượt khám (join 10 bảng) | Hoàng | f | SQL Server | S3.4 | `GET /visits/:id`, drawer chi tiết | 07/11 | 🟦 API ✅, UI đang làm |
 | S3.7 | FR7 Dashboard thống kê | Dương | h | SQL Server | S1.4 | `modules/stats`, `pages/dashboard` (biểu đồ) | 08/11 | ⬜ |
 | S3.8 | FR8 Truy vấn nâng cao | Dương | g | SQL Server | S1.4 | `modules/insights`, `pages/insights` | 10/11 | ⬜ |
-| S3.9 | FR9 Sinh hiệu real-time (SSE) + cảnh báo bất thường | Hoàng | a, d | **Cassandra** | S1.3 | `modules/vitals`, `pages/vitals`, trình giả lập thiết bị | 10/11 | ⬜ |
+| S3.9 | FR9 Sinh hiệu real-time (SSE) + cảnh báo bất thường | Hoàng | a, d | **Cassandra** | S1.3 | `modules/vitals`, `pages/vitals`, trình giả lập thiết bị | 10/11 | 🟦 API ✅, UI đang làm |
 | S3.10 | DB Lab: Storage / Index / Query plan | Dương | — | Cả 2 | T1–T3 | `modules/lab` (phần i–iii), `pages/db-lab` | 13/11 | ⬜ |
-| S3.11 | DB Lab: Transaction / Concurrency / Backup | Hoàng | — | Cả 2 | T4–T6 | `modules/lab` (phần iv–vi) | 13/11 | ⬜ |
-| S3.12 | Ghi access log mọi request vào Cassandra + trang xem log (ADMIN) | Hoàng | a, d | **Cassandra** | S0.4 | `middleware/access-log.js`, trang Nhật ký | 10/11 | 🟦 |
+| S3.11 | DB Lab: Transaction / Concurrency / Backup | Hoàng | — | Cả 2 | T4–T6 | `modules/lab` (phần iv–vi) | 13/11 | 🟦 API ✅, UI đang làm |
+| S3.12 | Ghi access log mọi request vào Cassandra + trang xem log (ADMIN) | Hoàng | a, d | **Cassandra** | S0.4 | `middleware/access-log.js`, trang Nhật ký | 10/11 | 🟦 API ✅, UI đang làm |
 
 ### Phase 4: Tích hợp & kiểm thử
 
