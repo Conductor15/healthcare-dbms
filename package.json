@@ -16,7 +16,7 @@
     "db:init": "npm run db:init -w server",
     "dev": "concurrently -n api,web -c cyan,magenta \"npm run dev -w server\" \"npm run dev -w client\"",
     "build": "npm run build -w client",
-    "format": "prettier --write \"server/**/*.js\" \"client/src/**/*.{js,jsx,css}\""
+    "format": "prettier --write \"server/**/*.js\" \"client/src/**/*.{js,jsx,css}\" \"demos/**/*.js\""
   },
   "devDependencies": {
     "concurrently": "^9.2.1",

@@ -30,6 +30,7 @@ Mẫu một dòng:
 | 2026-10-26 | S0.4 | Skeleton Express + React, auth JWT, module mẫu Khoa phòng, access log → Cassandra | S1.2, S1.5 | `server/`, `client/` | 2h | 🟨 | — |
 | 2026-10-26 | S5.1 | Khung report 6 section + References | Rubric | `report/README.md` | 0.25h | 🟨 | — |
 | 2026-10-26 | S0.2 | Sửa lỗi `db:init` timeout do Cassandra chưa khởi động xong: `db:up` dùng `--wait`, `db:init` tự retry kết nối Cassandra (≤3 phút) | Log lỗi `OperationTimedOutError` | `package.json`, `server/scripts/db-init.js` | 0.25h | 🟨 | Đã chạy E2E trên máy Hoàng: health 2 DB OK, CRUD khoa, 409 khi xoá khoa có bác sĩ, 403 với lễ tân, log ghi vào Cassandra |
+| 2026-10-26 | S1.6 | Bench harness dùng chung: đo latency (min/avg/p50/p95, logical reads), throughput song song (gom lỗi theo mã), chạy file .sql, xuất CSV | — | `demos/_common/bench.js`, `example.js`, `README.md` | 1h | 🟨 | Đã chạy thử trên 2 DB; 30 insert trùng song song → 1 OK / 29 lỗi 2627 |
 
 ## Dương
 

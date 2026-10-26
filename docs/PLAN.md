@@ -121,7 +121,7 @@ Mỗi step = 1 GitHub Issue (template "Step") + ≥1 PR. Tên branch chứa step
 | S1.3 | Data model Cassandra (query-first) | Dương (Hoàng review) | S1.1, bản nháp của Hoàng | `database/cassandra/01_schema.cql` + mục Cassandra trong `erd.md` | Mỗi bảng phục vụ ≥1 query, không query nào cần `ALLOW FILTERING` | 29/10 | 🟦 |
 | S1.4 | Bộ sinh dữ liệu lớn | Dương | S1.2, S1.3 | `server/scripts/generate-data.js` (`npm run db:generate -- --scale=1`) | Scale 1 = 100k bệnh nhân, ~300k lượt khám, ≥5M bản ghi sinh hiệu; có tham số scale | 31/10 | ⬜ |
 | S1.5 | API contract | Hoàng | S1.1 | `docs/design/api.md` | Mọi FR có endpoint + request/response mẫu | 29/10 | 🟨 |
-| S1.6 | Bench harness dùng chung | Hoàng | — | `demos/_common/bench.js` (chạy query N lần trên 2 DB, xuất CSV: min/avg/p95) | 6 topic dùng chung một cách đo | 31/10 | ⬜ |
+| S1.6 | Bench harness dùng chung | Hoàng | — | `demos/_common/bench.js` (chạy query N lần trên 2 DB, xuất CSV: min/avg/p95) | 6 topic dùng chung một cách đo | 31/10 | 🟨 |
 
 ### Phase 2: Demo 6 topic (trên **cả hai** DBMS)
 
