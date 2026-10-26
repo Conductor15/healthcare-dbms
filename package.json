@@ -1,0 +1,25 @@
+{
+  "name": "healthcare-dbms",
+  "private": true,
+  "description": "DBMS Assignment HK261: Healthcare clinic app on SQL Server + Cassandra",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "db:up": "docker compose up -d --wait",
+    "db:up:cluster": "docker compose --profile cluster up -d --wait",
+    "db:down": "docker compose down",
+    "db:init": "npm run db:init -w server",
+    "dev": "concurrently -n api,web -c cyan,magenta \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "format": "prettier --write \"server/**/*.js\" \"client/src/**/*.{js,jsx,css}\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "prettier": "^3.6.2"
+  }
+}

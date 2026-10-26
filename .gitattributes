@@ -1,0 +1,9 @@
+# Normalise line endings so Windows/macOS/Linux diffs stay clean.
+* text=auto eol=lf
+*.sh  text eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+*.pdf  binary
+*.docx binary
+*.png  binary
+*.jpg  binary

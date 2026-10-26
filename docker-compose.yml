@@ -1,0 +1,78 @@
+# Step S0.2: local DBMS environment.
+#   docker compose up -d                      → SQL Server + 1 Cassandra node (day-to-day dev)
+#   docker compose --profile cluster up -d    → + 2 more Cassandra nodes (topic v consistency, topic vi replication demos)
+name: healthcare-dbms
+
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: hc-mssql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?set MSSQL_SA_PASSWORD in .env}
+      MSSQL_AGENT_ENABLED: "true"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+      - mssql-backup:/var/opt/mssql/backup   # topic vi: BACKUP DATABASE ... TO DISK = '/var/opt/mssql/backup/...'
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' -b -o /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  cassandra:
+    image: cassandra:5.0
+    container_name: hc-cassandra
+    environment: &cassandra-env
+      CASSANDRA_CLUSTER_NAME: hc-cluster
+      CASSANDRA_DC: dc1
+      CASSANDRA_RACK: rack1
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+      CASSANDRA_SEEDS: cassandra
+      MAX_HEAP_SIZE: 1G
+      HEAP_NEWSIZE: 256M
+    ports:
+      - "9042:9042"
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+    healthcheck: &cassandra-health
+      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES' > /dev/null 2>&1"]
+      interval: 15s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+
+  cassandra2:
+    image: cassandra:5.0
+    container_name: hc-cassandra2
+    profiles: ["cluster"]
+    environment: *cassandra-env
+    volumes:
+      - cassandra2-data:/var/lib/cassandra
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    healthcheck: *cassandra-health
+
+  cassandra3:
+    image: cassandra:5.0
+    container_name: hc-cassandra3
+    profiles: ["cluster"]
+    environment: *cassandra-env
+    volumes:
+      - cassandra3-data:/var/lib/cassandra
+    depends_on:
+      cassandra2:
+        condition: service_healthy   # nodes must join one at a time
+    healthcheck: *cassandra-health
+
+volumes:
+  mssql-data:
+  mssql-backup:
+  cassandra-data:
+  cassandra2-data:
+  cassandra3-data:

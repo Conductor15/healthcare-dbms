@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.env
+*.log
+.DS_Store
+Thumbs.db
+
+# database backups pulled out of containers (topic vi): keep out of git
+*.bak
+*.trn
+backups/
+
+.vscode/*
+!.vscode/extensions.json
+.idea/

@@ -1,0 +1,15 @@
+# Thay HOANG_GITHUB / DUONG_GITHUB bằng username GitHub thật (xem CONTRIBUTING.md §7).
+# Owner của một đường dẫn sẽ tự động được yêu cầu review khi PR chạm vào đường dẫn đó.
+
+*                                   @HOANG_GITHUB @DUONG_GITHUB
+
+/demos/01-storage/                  @DUONG_GITHUB
+/demos/02-indexing/                 @DUONG_GITHUB
+/demos/03-query-processing/         @DUONG_GITHUB
+/demos/04-transaction/              @HOANG_GITHUB
+/demos/05-concurrency/              @HOANG_GITHUB
+/demos/06-backup-recovery/          @HOANG_GITHUB
+
+/database/mssql/                    @HOANG_GITHUB @DUONG_GITHUB
+/database/cassandra/                @DUONG_GITHUB @HOANG_GITHUB
+/docker-compose.yml                 @HOANG_GITHUB
