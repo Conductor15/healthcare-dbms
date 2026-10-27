@@ -1,0 +1,251 @@
+\section{Thực nghiệm và so sánh hai DBMS}
+\label{sec:demo}
+
+Mỗi chủ đề được trình bày theo cùng một trình tự: cơ sở lý thuyết, thiết lập thí nghiệm, kết quả, thảo luận và kết luận cho bối cảnh phòng khám. Script, số liệu và output đầy đủ nằm trong thư mục \texttt{demos/} của mã nguồn.
+
+%==================================================================
+\subsection{Data storage \& management}
+\label{sec:storage}
+\todo{Dương}{Chủ đề i (T1): lý thuyết, kịch bản, kết quả trên SQL Server và Cassandra, so sánh, kết luận cho phòng khám.}
+
+%==================================================================
+\subsection{Indexing}
+\label{sec:indexing}
+\todo{Dương}{Chủ đề ii (T2, topic chính của Dương).}
+
+%==================================================================
+\subsection{Query processing}
+\label{sec:query}
+\todo{Dương}{Chủ đề iii (T3).}
+
+%==================================================================
+\subsection{Transaction}
+\label{sec:transaction}
+
+\subsubsection{Cơ sở lý thuyết}
+Một transaction là một đơn vị công việc thoả \textbf{ACID}~\cite{silberschatz}: \textit{Atomicity} (tất cả hoặc không gì cả), \textit{Consistency} (đưa CSDL từ trạng thái hợp lệ sang trạng thái hợp lệ), \textit{Isolation} (các transaction đồng thời không thấy trạng thái dở dang của nhau), \textit{Durability} (đã commit thì không mất kể cả khi sập máy).
+
+\textbf{SQL Server} hỗ trợ transaction đầy đủ trên nhiều câu lệnh và nhiều bảng (\texttt{BEGIN TRAN \ldots{} COMMIT/ROLLBACK}, savepoint \texttt{SAVE TRAN}, \texttt{TRY\ldots CATCH}). Durability dựa trên \textit{write-ahead logging}: bản ghi log (ảnh trước/sau của dữ liệu) được ghi xuống file \texttt{.ldf} trước khi \texttt{COMMIT} trả về; trang dữ liệu được ghi sau, ở checkpoint~\cite{mssql-txlog}. Ba chế độ: autocommit (mặc định), implicit, explicit.
+
+\textbf{Cassandra} không có transaction nhiều partition. Mỗi lần ghi trong \textit{một} partition là atomic và isolated. \texttt{BATCH} dạng \textit{logged} đảm bảo mọi câu trong batch \textit{cuối cùng} đều được áp dụng (ghi vào batchlog trước), nhưng \textbf{không có isolation} và không có \texttt{ROLLBACK}~\cite{cassandra-docs}. \textit{Lightweight transaction} (LWT: \texttt{IF NOT EXISTS}, \texttt{IF <điều kiện>}) dùng giao thức Paxos~\cite{paxos} để compare-and-set tuyến tính hoá trên \textbf{một} partition. Cột thường không hỗ trợ phép toán đọc-sửa-ghi như \texttt{stock = stock - 10}.
+
+\subsubsection{Thiết lập thí nghiệm}
+Nghiệp vụ dùng xuyên suốt là \textbf{``khám bệnh''}: một lượt khám ghi 5 bảng (\texttt{visits}, \texttt{prescriptions}, \texttt{prescription\_items}, trừ \texttt{medicines.stock\_quantity}, \texttt{invoices}). Ràng buộc \texttt{CK\_medicines\_stock CHECK (stock\_quantity >= 0)} biến việc kê vượt tồn kho thành lỗi thật. Trên Cassandra, cùng nghiệp vụ được mô hình bằng các bảng phi chuẩn hoá trong keyspace \texttt{tx\_demo}.
+
+\subsubsection{Kết quả}
+
+\begin{table}[H]
+\centering
+\caption{Các kịch bản transaction trên hai DBMS}
+\small
+\begin{tabularx}{\linewidth}{|c|p{2.8cm}|X|X|}
+\hline
+\textbf{\#} & \textbf{Kịch bản} & \textbf{SQL Server} & \textbf{Cassandra} \\ \hline
+1 & Lỗi ở bước 4/5 của quy trình khám & \texttt{XACT\_STATE() = -1} $\rightarrow$ ROLLBACK; số dòng 4 bảng và tồn kho \textbf{trước = sau} & Câu 1 đã được ghi vĩnh viễn; khi ứng dụng dừng, CSDL còn lại \textbf{lượt khám không có hoá đơn}; \texttt{ROLLBACK} $\rightarrow$ \texttt{SyntaxException} \\ \hline
+2 & \texttt{XACT\_ABORT OFF} (mặc định) & Lỗi chỉ huỷ \textbf{một câu}, transaction vẫn mở, \texttt{COMMIT} lưu \textbf{nửa transaction} (Paracetamol bị trừ, Salbutamol không). \texttt{ON} $\rightarrow$ rollback toàn bộ & -- \\ \hline
+3 & Savepoint & Thuốc thứ 3 hết hàng $\rightarrow$ \texttt{ROLLBACK TRAN sp} chỉ bỏ thuốc 3, giữ thuốc 1--2. Chỉ dùng được khi \texttt{XACT\_ABORT OFF} & -- \\ \hline
+4 & Batch nhiều bảng & -- & Áp dụng đủ 3 bảng; batch có 1 câu sai kiểu bị từ chối toàn bộ; batch có điều kiện \textbf{không được} trải nhiều bảng \\ \hline
+5 & LWT & -- & \texttt{IF NOT EXISTS} lần 2: \texttt{[applied]=False}; \texttt{IF stock = 100}: lệnh của client thứ 2 không được áp dụng \\ \hline
+6 & Log của 1 transaction (\texttt{fn\_dblog}) & \texttt{LOP\_BEGIN\_XACT} $\rightarrow$ \texttt{LOP\_MODIFY\_COLUMNS} $\times 2$ $\rightarrow$ \texttt{LOP\_COMMIT\_XACT} & -- \\ \hline
+7 & Crash (\texttt{kill -9}) & Xem Mục~\ref{sec:backup}: dữ liệu đã commit được REDO, chưa commit bị UNDO & Commit log replay \\ \hline
+\end{tabularx}
+\end{table}
+
+\textbf{Torn read}: 1 writer cập nhật 2 dòng \textit{trong cùng một} transaction/batch, 4 reader đọc liên tục trong 4 giây và đếm số lần thấy 2 dòng lệch phiên bản (Bảng~\ref{tab:torn-read}).
+
+\begin{table}[H]
+\centering
+\caption{Tỉ lệ torn read theo DBMS và mức đọc}
+\label{tab:torn-read}
+\begin{tabular}{|l|l|r|r|}
+\hline
+\textbf{DBMS} & \textbf{Cách ghi / mức đọc} & \textbf{Lượt đọc} & \textbf{Torn read} \\ \hline
+SQL Server & READ UNCOMMITTED & 10\,166 & 0.51\% \\ \hline
+SQL Server & READ COMMITTED (mặc định) & 3\,360 & \textbf{0.15\%} \\ \hline
+SQL Server & REPEATABLE READ & 3\,365 & 0 \\ \hline
+SQL Server & SNAPSHOT & 11\,165 & 0 \\ \hline
+Cassandra & LOGGED batch & 13\,351 & \textbf{5.22\%} \\ \hline
+Cassandra & UNLOGGED batch & 18\,526 & 9.75\% \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Chi phí ghi 2000 dòng}
+\label{tab:tx-cost}
+\begin{tabular}{|l|l|r|}
+\hline
+\textbf{DBMS} & \textbf{Cách ghi} & \textbf{Dòng/s} \\ \hline
+SQL Server & Autocommit, 1 client (2000 lần flush log) & 152 \\ \hline
+SQL Server & 1 transaction cho 2000 dòng & 1\,169 ($\times 7.7$) \\ \hline
+SQL Server & Autocommit, 16 client & 1\,194 \\ \hline
+Cassandra & INSERT đơn, 1 client / 16 client & 1\,095 / 15\,488 \\ \hline
+Cassandra & UNLOGGED batch 50 dòng cùng partition & 30\,200 \\ \hline
+Cassandra & LWT \texttt{IF NOT EXISTS} & 581 (chậm $\times 1.9$) \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Thảo luận}
+\begin{itemize}
+    \item Batch của Cassandra là \textbf{atomic nhưng không isolated}: 5\% số lần đọc thấy trạng thái chưa hoàn tất của batch.
+    \item READ COMMITTED của SQL Server cũng không đảm bảo đọc nhất quán \textit{nhiều dòng}, vì khoá S nhả sau từng dòng. Muốn nhất quán thì cần REPEATABLE READ (giữ khoá) hoặc SNAPSHOT (đọc phiên bản). SNAPSHOT vừa đúng vừa không chặn writer, nên đọc được nhiều gấp 3.3 lần.
+    \item Chi phí chính của transaction SQL Server là flush log lúc commit; gom thao tác vào một transaction tăng tốc 7.7 lần.
+    \item Cassandra đạt throughput ghi cao do không duy trì transaction. Khi cần đảm bảo tính đúng đắn bằng LWT, chi phí tăng do các vòng trao đổi của giao thức Paxos.
+\end{itemize}
+
+\subsubsection{Kết luận cho bối cảnh phòng khám}
+Khám bệnh, kê đơn, trừ kho, lập hoá đơn, đặt lịch là các nghiệp vụ \textbf{bắt buộc atomic trên nhiều bảng}, nên dùng SQL Server. Ứng dụng chạy chúng trong \texttt{withTransaction()} (luôn rollback khi có lỗi, tránh trường hợp commit một phần như kịch bản 2). Dữ liệu sinh hiệu chỉ cần atomic trong một lần đo, và ứng dụng dùng \textit{logged batch} để ghi 3 bảng phi chuẩn hoá của một lần đo trên Cassandra.
+
+%==================================================================
+\subsection{Concurrency control}
+\label{sec:concurrency}
+
+\subsubsection{Cơ sở lý thuyết}
+\textbf{SQL Server} mặc định dùng \textit{pessimistic locking}~\cite{mssql-locking}: khoá chia sẻ (S), cập nhật (U), độc quyền (X) cùng khoá ý định (IS/IX/SIX) theo cây tài nguyên KEY $\rightarrow$ PAGE $\rightarrow$ OBJECT. Khi một câu lệnh giữ quá nhiều khoá ($\sim$5000) thì \textit{leo thang} thành khoá cả bảng. Mức cô lập quyết định khoá S được giữ bao lâu: READ UNCOMMITTED (không lấy khoá S), READ COMMITTED (nhả sau mỗi dòng), REPEATABLE READ (giữ tới cuối transaction), SERIALIZABLE (giữ thêm khoá khoảng). Ngoài ra có hai mức dựa trên \textbf{MVCC} (version store trong tempdb): SNAPSHOT và READ COMMITTED SNAPSHOT. Deadlock được một tiến trình nền phát hiện, nó chọn một \textit{victim} để huỷ (lỗi 1205).
+
+\textbf{Cassandra} không dùng khoá. Mỗi ô dữ liệu mang \textit{write timestamp} và giá trị có timestamp lớn nhất thắng (\textit{last-write-wins}). Nhất quán giữa các bản sao là \textbf{tunable}~\cite{cassandra-docs}: mỗi câu lệnh chọn consistency level (ONE, QUORUM, ALL). Đọc và ghi nhất quán mạnh khi $R + W > RF$. Muốn compare-and-set thì dùng LWT (Paxos) trên một partition.
+
+\subsubsection{Kết quả}
+
+\textbf{Thí nghiệm 1: hiện tượng $\times$ mức cô lập} (SQL Server, 2 phiên xen kẽ tất định, lock timeout 1.5 s). Dấu $\times$ nghĩa là hiện tượng xảy ra, $\checkmark$ nghĩa là được ngăn chặn kèm cơ chế ngăn chặn.
+
+\begin{table}[H]
+\centering
+\caption{Hiện tượng bất thường theo mức cô lập trên SQL Server}
+\label{tab:isolation}
+\small
+\begin{tabularx}{\linewidth}{|p{3.2cm}|X|X|X|X|X|}
+\hline
+\textbf{Hiện tượng} & \textbf{READ UNCOMMITTED} & \textbf{READ COMMITTED} & \textbf{REPEATABLE READ} & \textbf{SERIALIZABLE} & \textbf{SNAPSHOT} \\ \hline
+Dirty read & $\times$ & $\checkmark$ khoá & $\checkmark$ khoá & $\checkmark$ khoá & $\checkmark$ phiên bản \\ \hline
+Non-repeatable read & $\times$ & $\times$ & $\checkmark$ khoá & $\checkmark$ khoá & $\checkmark$ phiên bản \\ \hline
+Phantom read & $\times$ & $\times$ & $\times$ & $\checkmark$ khoá khoảng & $\checkmark$ phiên bản \\ \hline
+Lost update (đọc rồi ghi) & $\times$ & $\times$ & $\checkmark$ chặn $\rightarrow$ thử lại & $\checkmark$ chặn $\rightarrow$ thử lại & $\checkmark$ xung đột 3960 \\ \hline
+Lost update (\texttt{qty = qty - 10}) & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\ \hline
+\end{tabularx}
+\end{table}
+
+Kết quả khớp hoàn toàn bảng lý thuyết (25/25 ô) và cho thấy ba cơ chế: khoá, đa phiên bản, phát hiện xung đột.
+
+\textbf{Thí nghiệm 2: 50 bệnh nhân đặt cùng một khung giờ} (chức năng FR3).
+
+\begin{table}[H]
+\centering
+\caption{Double-booking: 50 yêu cầu đồng thời cho cùng một khung giờ}
+\label{tab:double-booking}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Cách làm} & \textbf{Báo thành công} & \textbf{Bản ghi lưu} \\ \hline
+SQL Server, đọc \texttt{is\_booked} rồi ghi, không khoá & 50 & \textbf{50} \\ \hline
+SQL Server, transaction + \texttt{WITH (UPDLOCK, HOLDLOCK)} & 1 & 1 \\ \hline
+SQL Server, chỉ UNIQUE index & 1 (49 lỗi 2627) & 1 \\ \hline
+Cassandra, SELECT rồi INSERT & 50 & 1 (\textbf{ghi đè, không báo lỗi}) \\ \hline
+Cassandra, \texttt{INSERT \ldots{} IF NOT EXISTS} & 1 & 1 \\ \hline
+\end{tabular}
+\end{table}
+
+\textbf{Thí nghiệm 3: khoá và leo thang khoá.} UPDATE 100 dòng giữ 100 khoá \texttt{KEY X} và khoá ý định IX ở PAGE/OBJECT. UPDATE 10\,000 dòng thì leo thang thành \texttt{OBJECT X}. Tắt leo thang thì giữ 10\,000 khoá \texttt{KEY X}.
+
+\textbf{Thí nghiệm 4: deadlock.} T1 giữ thuốc 1 chờ thuốc 2, T2 ngược lại; \texttt{sys.dm\_tran\_locks} cho thấy khoá \texttt{KEY X} ở trạng thái WAIT. SQL Server phát hiện sau khoảng 1.2 s, chọn một victim (1205); victim thử lại thì tồn kho cuối đúng.
+
+\textbf{Thí nghiệm 5: last-write-wins.} Bản đo $t=5$ thắng bản $t=3$ dù đến trước. Bản retry cũ ($t=1$) đến sau \textbf{bị bỏ qua không báo lỗi}. Xung đột được giải quyết theo từng ô (2 client sửa 2 cột khác nhau đều giữ được).
+
+\textbf{Thí nghiệm 6: tunable consistency} (3 node, $RF = 3$, tắt hinted handoff). Kịch bản: node 3 ngừng hoạt động trong lúc hệ thống ghi thông tin dị ứng \textit{penicillin} của một bệnh nhân.
+
+\begin{table}[H]
+\centering
+\caption{Tunable consistency trên cluster 3 node}
+\label{tab:consistency}
+\begin{tabularx}{\linewidth}{|X|c|X|}
+\hline
+\textbf{Bước} & \textbf{CL} & \textbf{Kết quả} \\ \hline
+Ghi khi node 3 ngừng hoạt động & ALL & Unavailable (cần 3, còn 2) \\ \hline
+Ghi khi node 3 ngừng hoạt động & QUORUM & OK \\ \hline
+Node 3 hoạt động lại, đọc $\times 5$ qua node 3 & ONE & \texttt{penicillin} $\times 2$, \texttt{none} $\times 3$: \textbf{bỏ sót dị ứng 3/5 lần} \\ \hline
+Đọc qua node 3 & QUORUM & \texttt{penicillin} ($R + W = 4 > 3$), read repair sửa node 3 \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsubsection{Thảo luận và kết luận cho bối cảnh phòng khám}
+\begin{itemize}
+    \item Tài nguyên khan hiếm bị nhiều người tranh (khung giờ khám, tồn kho thuốc) cần điều khiển đồng thời chặt. Nếu không dùng cơ chế kiểm soát đồng thời, kết quả trên \textbf{cả hai} DBMS đều sai: SQL Server tạo 50 lịch hẹn trùng, Cassandra ghi đè dữ liệu mà không báo lỗi. SQL Server cho nhiều công cụ để làm đúng (khoá, mức cô lập, ràng buộc UNIQUE, UPDATE atomic), còn Cassandra chỉ có LWT trên một partition.
+    \item Ứng dụng dùng \texttt{UPDLOCK + HOLDLOCK} kèm filtered UNIQUE index khi đặt lịch, và \texttt{UPDATE \ldots{} WHERE stock\_quantity >= @qty} khi trừ kho. Test E2E bắn 20 request cùng lúc vào cùng 1 slot qua API thật: đúng 1 thành công.
+    \item Với sinh hiệu, mỗi bệnh nhân chỉ có một nguồn ghi là thiết bị, nên last-write-wins chấp nhận được. Ứng dụng ghi \texttt{USING TIMESTAMP} bằng thời điểm đo để gói tin đến muộn không đè số mới.
+    \item Dữ liệu lâm sàng quan trọng (dị ứng) \textbf{không được} đọc ở CL ONE nếu đặt trên Cassandra. Phải dùng QUORUM/QUORUM, chấp nhận độ trễ cao hơn.
+\end{itemize}
+
+%==================================================================
+\subsection{Data backup and recovery}
+\label{sec:backup}
+
+\subsubsection{Cơ sở lý thuyết}
+Cần phân biệt ba loại sự cố: \textbf{sập tiến trình/máy} (crash), \textbf{lỗi người dùng} (xoá/sửa nhầm) và \textbf{mất máy chủ}.
+
+\textbf{SQL Server} khôi phục sau crash bằng thuật toán họ ARIES~\cite{aries} gồm ba pha trên transaction log: \textit{Analysis}, \textit{Redo} (làm lại các thay đổi đã commit nhưng chưa nằm trong file dữ liệu), \textit{Undo} (huỷ thay đổi của transaction chưa commit dù đã bị ghi xuống đĩa). Sao lưu gồm full, differential, transaction log~\cite{mssql-backup}. Ở \textit{FULL recovery model}, log được giữ tới khi được sao lưu, nhờ đó có thể khôi phục \textbf{tới một thời điểm bất kỳ} (\texttt{RESTORE LOG \ldots{} WITH STOPAT}). \texttt{CHECKSUM} và \texttt{RESTORE VERIFYONLY} kiểm tra tính toàn vẹn của bản sao lưu.
+
+\textbf{Cassandra} khôi phục sau crash bằng cách \textit{replay commit log} vào memtable. Commit log mặc định đồng bộ định kỳ 10 s (\texttt{periodic}). Sao lưu là \texttt{nodetool snapshot}: hard link tới các SSTable bất biến nên tức thì. \textit{Incremental backup} hard link thêm mọi SSTable mới được flush. Mọi thao tác thực hiện \textbf{trên từng node}~\cite{cassandra-docs}. Replication ($RF = N$) mang lại tính sẵn sàng, nhưng không thay thế sao lưu.
+
+\subsubsection{Kết quả}
+
+\begin{table}[H]
+\centering
+\caption{Các kịch bản sao lưu và phục hồi}
+\label{tab:backup}
+\small
+\begin{tabularx}{\linewidth}{|c|p{3.6cm}|X|}
+\hline
+\textbf{\#} & \textbf{Kịch bản} & \textbf{Kết quả} \\ \hline
+1 & FULL recovery, 20\,000 insert/update + CHECKPOINT & \texttt{log\_reuse\_wait = LOG\_BACKUP}, log dùng 28.5 MB (39.6\%) và \textbf{không giải phóng} cho tới khi \texttt{BACKUP LOG} (còn 12.6 MB) \\ \hline
+2 & Chuỗi FULL $\rightarrow$ DIFF $\rightarrow$ LOG & 3 file đều \textit{valid} qua \texttt{RESTORE VERIFYONLY \ldots{} WITH CHECKSUM}; LSN nối tiếp; DIFF và LOG cùng \texttt{based\_on\_full\_lsn}; nén 26.1 MB $\rightarrow$ 1.06 MB \\ \hline
+3 & \textbf{Point-in-time} sau \texttt{UPDATE medicines SET unit\_price = 0} (quên WHERE) & Restore \textbf{bản sao} \texttt{HealthcareDB\_PITR} từ full + log với \texttt{STOPAT} = 1 s trước sự cố, sửa 15 dòng từ bản sao; thay đổi hợp lệ sau full backup được giữ; DB chính không phải dừng. Trong app: $\sim$1.4 s \\ \hline
+4 & \texttt{kill -9} SQL Server & UPDATE chưa commit (đã bị CHECKPOINT ghi xuống đĩa) $\rightarrow$ \textbf{UNDO}; INSERT đã commit chỉ có trong log $\rightarrow$ \textbf{REDO}. Errorlog: \textit{``2 transactions rolled forward \ldots{} 1 transactions rolled back''} \\ \hline
+5 & \texttt{kill -9} Cassandra & 500 dòng đã ack, \textbf{0 SSTable}; sau restart đủ 500 dòng: \textit{``Log replay complete, 662 replayed mutations''} \\ \hline
+6 & Snapshot + incremental, rồi TRUNCATE & Import từ snapshot: 100/120 dòng (mất phần sau snapshot); import thêm incremental: 120/120. \texttt{auto\_snapshot} cũng tự chụp trước TRUNCATE \\ \hline
+7 & Replication $\neq$ backup (3 node, $RF = 3$) & Mất 1 node vẫn đọc QUORUM được (HA); TRUNCATE bị từ chối khi thiếu node; TRUNCATE khi đủ node xoá \textbf{trên cả 3 bản sao}; chỉ snapshot từng node cứu được \\ \hline
+8 & Lịch tự động & SQL Server Agent: full hằng tuần, differential hằng ngày, log mỗi 15 phút \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsubsection{So sánh}
+
+\begin{table}[H]
+\centering
+\caption{So sánh khả năng sao lưu và phục hồi}
+\label{tab:backup-compare}
+\begin{tabularx}{\linewidth}{|p{3.4cm}|X|X|}
+\hline
+\textbf{Tiêu chí} & \textbf{SQL Server} & \textbf{Cassandra} \\ \hline
+RPO khi lỗi người dùng & $\approx 0$ (point-in-time tới từng giây) & Bằng khoảng cách snapshot (incremental thu hẹp) \\ \hline
+Crash recovery & Redo/Undo tự động, không mất transaction đã commit & Replay commit log; có thể mất $\sim$10 s khi \textbf{mất điện cả máy} (periodic sync) \\ \hline
+Mất máy chủ & Cần thêm Always On / log shipping & Có sẵn qua replication \\ \hline
+Phạm vi một bản sao lưu & Toàn DB, nhất quán tại một thời điểm & Từng node, từng bảng \\ \hline
+Kiểm tra toàn vẹn & CHECKSUM, VERIFYONLY có sẵn & Phải tự làm \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsubsection{Kết luận cho bối cảnh phòng khám}
+\begin{itemize}
+    \item Hồ sơ bệnh án, đơn thuốc, hoá đơn yêu cầu RPO $\approx 0$ với cả crash lẫn lỗi người dùng, nên dùng SQL Server ở FULL recovery, log backup 15 phút và quy trình restore bản sao rồi sửa (kịch bản 3).
+    \item Sinh hiệu trên Cassandra cần \textit{luôn ghi được} hơn là khôi phục tới từng giây, nên dùng replication cho HA cùng snapshot hằng ngày và incremental backup.
+    \item Kinh nghiệm rút ra trong quá trình thực hiện: một script thí nghiệm từng tiếp tục chạy sau khi lệnh BACKUP thất bại và làm sai lệch giá thuốc. Nhóm đã bổ sung cơ chế dừng ngay ở lỗi đầu tiên, bước kiểm tra bắt buộc phải có bản full backup mới trước mọi thao tác có thể làm mất dữ liệu, và trong ứng dụng, thí nghiệm tự khôi phục dữ liệu nếu một bước bất kỳ gặp lỗi.
+\end{itemize}
+
+%==================================================================
+\subsection{Tổng hợp: DBMS phù hợp cho từng loại dữ liệu}
+\label{sec:summary}
+
+\begin{table}[H]
+\centering
+\caption{Tổng hợp kết luận 6 chủ đề}
+\label{tab:summary}
+\begin{tabularx}{\linewidth}{|p{2.8cm}|X|X|}
+\hline
+\textbf{Chủ đề} & \textbf{Dữ liệu lâm sàng, tài chính} & \textbf{Sinh hiệu, nhật ký} \\ \hline
+i. Storage & \colorbox{yellow!40}{TODO (Dương)} & \colorbox{yellow!40}{TODO (Dương)} \\ \hline
+ii. Indexing & \colorbox{yellow!40}{TODO (Dương)} & \colorbox{yellow!40}{TODO (Dương)} \\ \hline
+iii. Query processing & \colorbox{yellow!40}{TODO (Dương)} & \colorbox{yellow!40}{TODO (Dương)} \\ \hline
+iv. Transaction & \textbf{SQL Server}: cần atomic nhiều bảng & \textbf{Cassandra}: atomic trong một lần đo là đủ (logged batch) \\ \hline
+v. Concurrency & \textbf{SQL Server}: khoá, mức cô lập, UNIQUE chống đặt trùng và lost update & \textbf{Cassandra}: một nguồn ghi, last-write-wins chấp nhận được \\ \hline
+vi. Backup \& recovery & \textbf{SQL Server}: RPO $\approx 0$, point-in-time restore & \textbf{Cassandra}: HA qua replication, snapshot + incremental \\ \hline
+\end{tabularx}
+\end{table}

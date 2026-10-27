@@ -1,0 +1,136 @@
+\section{Biên bản họp}
+\label{app:meetings}
+
+\subsection*{Biên bản họp \#1: Kickoff}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\linewidth}{|p{3cm}|X|}
+\hline
+Ngày giờ & 26/10/2026, 21:00--22:00 \\ \hline
+Hình thức & Online \\ \hline
+Thành phần & Hoàng, Dương \\ \hline
+Người ghi & Hoàng \\ \hline
+\end{tabularx}
+\end{table}
+
+\textbf{Nội dung:}
+\begin{enumerate}
+    \item Đề bài, tiêu chí chấm điểm, mục tiêu điểm tối đa và bonus.
+    \item Kế hoạch trong \texttt{docs/PLAN.md}: phân công, timeline, các bước kèm input/output.
+    \item Quy trình Git, Pull Request, review trong 24 giờ (\texttt{CONTRIBUTING.md}).
+    \item Hoàng báo cáo phần đã làm: ứng dụng (FR3, FR4, FR6, FR9, nhật ký truy cập), DB Lab, ba chủ đề iv--vi.
+    \item Dương chạy repo trên máy mình, xử lý lỗi môi trường tại chỗ.
+    \item Chốt các quyết định và việc cần làm đến buổi sau.
+\end{enumerate}
+
+\textbf{Quyết định:}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\linewidth}{|c|p{3.6cm}|X|c|}
+\hline
+\textbf{\#} & \textbf{Nội dung} & \textbf{Đề xuất} & \textbf{Chốt} \\ \hline
+D1 & DBMS & SQL Server 2022 và Cassandra 5.0 & \\ \hline
+D2 & Domain & Healthcare: phòng khám đa khoa & \\ \hline
+D3 & Chủ đề & Dương: i, ii, iii; Hoàng: iv, v, vi & \\ \hline
+D4 & Chủ đề chính & Dương: ii Indexing; Hoàng: iv Transaction & \\ \hline
+D5 & Số chức năng & 9 FR & \\ \hline
+D6 & Ứng dụng dùng cả 2 DBMS & Có (polyglot persistence) & \\ \hline
+D7 & Công nghệ & React 19 + Ant Design 6 + Vite 7; Node.js 24 + Express 5 & \\ \hline
+D8 & Hạn nộp chính xác & Hoàng hỏi giảng viên & \\ \hline
+D9 & Code freeze nội bộ & Chủ nhật 15/11/2026 & \\ \hline
+D10 & Lịch họp cố định & Thứ 2 và thứ 5, 21:00 & \\ \hline
+D11 & Người nộp bài & Hoàng & \\ \hline
+D13 & Ngôn ngữ báo cáo & Tiếng Việt & \\ \hline
+\end{tabularx}
+\end{table}
+
+\todo{Hoàng}{Sau buổi họp: đánh dấu cột \textit{Chốt}, ghi kết quả D8 (hạn nộp) và bổ sung biên bản các buổi họp sau.}
+
+\textbf{Việc cần làm đến buổi sau (29/10/2026):}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\linewidth}{|X|c|c|c|}
+\hline
+\textbf{Việc} & \textbf{Bước} & \textbf{Người} & \textbf{Hạn} \\ \hline
+Chạy được app và 2 DB trên máy, PR đầu tiên ghi TRACKLOG & S0.6 & Dương & 27/10 \\ \hline
+Review PR \texttt{feat/hoang-T4-T6-app} & -- & Dương & 28/10 \\ \hline
+Review schema SQL Server, hoàn thiện schema Cassandra & S1.2, S1.3 & Dương & 29/10 \\ \hline
+Bộ sinh dữ liệu lớn & S1.4 & Dương & 31/10 \\ \hline
+Bắt đầu chủ đề i (lý thuyết + kịch bản) & T1.1--T1.2 & Dương & 30/10 \\ \hline
+Bật branch protection, Projects board, mời Dương & S0.3 & Hoàng & 26/10 \\ \hline
+\end{tabularx}
+\end{table}
+
+\section{Ma trận truy vết yêu cầu đề}
+\label{app:trace}
+
+\begin{table}[H]
+\centering
+\caption{Truy vết yêu cầu của đề bài}
+\label{tab:trace}
+\small
+\begin{tabularx}{\linewidth}{|p{4.4cm}|X|p{2.2cm}|}
+\hline
+\textbf{Yêu cầu của đề} & \textbf{Đáp ứng ở đâu} & \textbf{Trạng thái} \\ \hline
+\multicolumn{3}{|l|}{\textbf{Chủ đề DBMS: mỗi thành viên ít nhất 1 chủ đề, trên cả 2 DBMS, so sánh và kết luận}} \\ \hline
+i. Data storage \& management & Mục~\ref{sec:storage}; \texttt{demos/01-storage/} & Dương \\ \hline
+ii. Indexing & Mục~\ref{sec:indexing}; \texttt{demos/02-indexing/} & Dương \\ \hline
+iii. Query processing & Mục~\ref{sec:query}; \texttt{demos/03-query-processing/} & Dương \\ \hline
+iv. Transaction & Mục~\ref{sec:transaction}; \texttt{demos/04-transaction/}; DB Lab tab iv & Hoàn thành \\ \hline
+v. Concurrency control & Mục~\ref{sec:concurrency}; \texttt{demos/05-concurrency/}; DB Lab tab v & Hoàn thành \\ \hline
+vi. Data backup \& recovery & Mục~\ref{sec:backup}; \texttt{demos/06-backup-recovery/}; DB Lab tab vi & Hoàn thành \\ \hline
+Kết luận DBMS phù hợp cho bối cảnh & Mục~\ref{sec:summary}, Mục~\ref{sec:conclusion} & Hoàn thành iv--vi \\ \hline
+\multicolumn{3}{|l|}{\textbf{Ứng dụng: chạy trên ít nhất 1 DBMS, kiến trúc được báo cáo}} \\ \hline
+Kiến trúc client-server / n-tier & Mục 4.2, Hình~\ref{fig:arch} & Hoàn thành \\ \hline
+Ít nhất $n = 2 \times 2 = 4$ FR (không tính đăng nhập) & Bảng~\ref{tab:fr}: 9 FR. Đã có FR3, FR4, FR6, FR9 & 4/9 xong, 5 FR của Dương \\ \hline
+\multicolumn{3}{|l|}{\textbf{8 loại query-update}} \\ \hline
+a. Insert & \texttt{POST /appointments}, \texttt{/visits}, \texttt{/vitals} & Hoàn thành \\ \hline
+b. Delete & \texttt{DELETE /appointments/:id}, \texttt{/departments/:id} & Hoàn thành \\ \hline
+c. Update & \texttt{PATCH /appointments/:id/cancel}, \texttt{/invoices/:id/pay}; trừ tồn kho & Hoàn thành \\ \hline
+d. Query 1 điều kiện & \texttt{GET /vitals/:patientId}, \texttt{GET /access-logs} (Cassandra); \texttt{GET /patients?name=} (FR1, Dương) & Hoàn thành \\ \hline
+e. Query đa điều kiện & \texttt{GET /appointments?date\&doctorId\&status}; \texttt{GET /patients/search} (FR5, Dương) & Hoàn thành \\ \hline
+f. Query có join & \texttt{GET /visits/:id} (join 10 bảng) & Hoàn thành \\ \hline
+g. Query có subquery & \texttt{GET /insights/frequent-patients} (FR8) & Dương \\ \hline
+h. Query có hàm tổng hợp & \texttt{GET /stats/visits-by-month} (FR7) & Dương \\ \hline
+\multicolumn{3}{|l|}{\textbf{Làm việc nhóm và báo cáo}} \\ \hline
+Báo cáo đóng góp từng thành viên & Mục~\ref{sec:teamwork} & Hoàn thành phần Hoàng \\ \hline
+Ít nhất 1 biên bản họp & Phụ lục~\ref{app:meetings} & Hoàn thành \\ \hline
+Trích dẫn tài liệu tái sử dụng & Tài liệu tham khảo & Hoàn thành \\ \hline
+Nộp 1 file zip lên LMS (trưởng nhóm) & Hoàng nộp & Chưa đến hạn \\ \hline
+\end{tabularx}
+\end{table}
+
+\section{Hướng dẫn cài đặt}
+\label{app:install}
+Yêu cầu: Node.js $\geq$ 22, Docker Desktop (cấp $\geq$ 4 GB RAM), Git.
+
+\begin{lstlisting}[language=bash, numbers=none]
+git clone https://github.com/Conductor15/healthcare-dbms.git
+cd healthcare-dbms
+cp .env.example .env
+npm install
+
+npm run db:up        # start SQL Server + Cassandra, wait until healthy
+npm run db:init      # create databases, schema and sample data
+npm run dev          # API :4000 + web :5173
+\end{lstlisting}
+
+Mở \url{http://localhost:5173} và đăng nhập bằng một trong các tài khoản \texttt{admin/admin123}, \texttt{reception/reception123}, \texttt{doctor1/doctor123}. Kiểm tra kết nối cơ sở dữ liệu tại \url{http://localhost:4000/api/health}.
+
+\begin{table}[H]
+\centering
+\caption{Các lệnh thường dùng}
+\begin{tabularx}{\linewidth}{|p{5.6cm}|X|}
+\hline
+\textbf{Lệnh} & \textbf{Tác dụng} \\ \hline
+\texttt{npm run test:e2e -w server} & Chạy 14 test API end-to-end (cần 2 DB đang chạy) \\ \hline
+\texttt{node demos/run.js <file> -{}-save} & Chạy script demo trong container, ghi output vào \texttt{results/} \\ \hline
+\texttt{npm run db:up:cluster} & Thêm 2 node Cassandra cho demo consistency/replication \\ \hline
+\texttt{npm run db:down} & Dừng container, giữ dữ liệu \\ \hline
+\end{tabularx}
+\end{table}

@@ -1,0 +1,42 @@
+\section{Giới thiệu}
+
+\subsection{Bối cảnh}
+Một phòng khám đa khoa cần quản lý hai loại dữ liệu có tính chất trái ngược nhau:
+\begin{itemize}
+    \item \textbf{Dữ liệu nghiệp vụ lâm sàng và tài chính}: hồ sơ bệnh nhân, bác sĩ, lịch hẹn, lượt khám, đơn thuốc, tồn kho, hoá đơn. Dữ liệu có quan hệ chặt, được nhiều người sửa đồng thời (lễ tân, bác sĩ, thu ngân). Đây là dữ liệu có giá trị pháp lý: không được mất, không được sai lệch.
+    \item \textbf{Dữ liệu thiết bị và hệ thống}: chỉ số sinh hiệu do máy đo gửi liên tục (nhịp tim, huyết áp, SpO$_2$, nhiệt độ) và nhật ký truy cập. Dữ liệu chỉ ghi thêm, khối lượng lớn, đọc theo mẫu cố định (theo bệnh nhân và thời gian), cần ghi được kể cả khi một máy chủ gặp sự cố.
+\end{itemize}
+
+Hai nhóm dữ liệu trên đặt ra các yêu cầu khác nhau về tính nhất quán, khả năng mở rộng và tính sẵn sàng, nên khó có một hệ quản trị đáp ứng tốt cả hai. Đề tài khảo sát Microsoft SQL Server (hệ quản trị quan hệ) và Apache Cassandra (hệ quản trị NoSQL dạng wide-column) qua sáu chủ đề của môn học, so sánh kết quả thực nghiệm trên từng chủ đề để xác định vai trò phù hợp của mỗi hệ quản trị đối với từng nhóm dữ liệu. Kết quả này được hiện thực trong một ứng dụng sử dụng đồng thời cả hai hệ quản trị theo mô hình \textit{polyglot persistence}.
+
+\subsection{Mục tiêu và phạm vi}
+
+\begin{table}[H]
+\centering
+\caption{Mục tiêu và phạm vi thực hiện}
+\begin{tabularx}{\linewidth}{|p{3.6cm}|X|}
+\hline
+\textbf{Mục tiêu} & \textbf{Phạm vi thực hiện} \\ \hline
+So sánh 2 DBMS theo các chủ đề của môn học & Cả \textbf{6/6 chủ đề} (đề yêu cầu tối thiểu 2 với nhóm 2 người): lưu trữ, chỉ mục, xử lý truy vấn, giao dịch, điều khiển đồng thời, sao lưu và phục hồi. Mỗi chủ đề có kịch bản trên \textbf{cả hai} DBMS, số đo, bảng so sánh và kết luận cho bối cảnh phòng khám. \\ \hline
+Xây dựng ứng dụng & Ứng dụng web n-tier với \textbf{9 chức năng} (đề yêu cầu 4), đủ \textbf{8 loại truy vấn/cập nhật}, dùng \textbf{cả hai} DBMS theo mô hình \textit{polyglot persistence}. \\ \hline
+Đưa kết quả nghiên cứu vào ứng dụng & Trang \textbf{DB Lab} chạy các thí nghiệm ngay trong ứng dụng; các kỹ thuật rút ra (khoá chống đặt trùng lịch, transaction kê đơn, logged batch, point-in-time restore) được dùng trong chức năng thật. \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Phân công tổng quan}
+
+\begin{table}[H]
+\centering
+\caption{Phân công tổng quan}
+\begin{tabularx}{\linewidth}{|p{2.4cm}|X|X|p{3cm}|}
+\hline
+\textbf{Thành viên} & \textbf{Chủ đề DBMS} & \textbf{Chức năng ứng dụng} & \textbf{Khác} \\ \hline
+Hoàng (trưởng nhóm) & iv. Transaction, v. Concurrency control, vi. Backup \& recovery & FR3 Lịch hẹn, FR4 Khám \& kê đơn, FR6 Chi tiết lượt khám, FR9 Sinh hiệu (Cassandra), nhật ký truy cập, DB Lab iv--vi & Hạ tầng, quy trình làm việc, kiểm thử \\ \hline
+Dương & i. Data storage \& management, ii. Indexing, iii. Query processing & FR1 Bệnh nhân, FR2 Bác sĩ, FR5 Tìm kiếm, FR7 Thống kê, FR8 Truy vấn nâng cao, DB Lab i--iii & Mô hình dữ liệu Cassandra, bộ sinh dữ liệu lớn \\ \hline
+\end{tabularx}
+\end{table}
+
+Chi tiết đóng góp được trình bày ở Mục~\ref{sec:teamwork}.
+
+\subsection{Cấu trúc báo cáo}
+Mục~\ref{sec:background} giới thiệu hai DBMS và môi trường thực nghiệm. Mục~\ref{sec:demo} trình bày thực nghiệm và so sánh cho 6 chủ đề. Mục~\ref{sec:app} mô tả ứng dụng: yêu cầu, kiến trúc, thiết kế dữ liệu, hiện thực và trang DB Lab. Mục~\ref{sec:teamwork} báo cáo cách làm việc nhóm. Mục~\ref{sec:conclusion} kết luận và tự đánh giá theo tiêu chí chấm điểm.

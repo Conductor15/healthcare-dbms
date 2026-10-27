@@ -1,0 +1,81 @@
+\section{Làm việc nhóm}
+\label{sec:teamwork}
+
+\subsection{Phân công và đóng góp}
+
+\begin{table}[H]
+\centering
+\caption{Phân công và tỉ lệ đóng góp}
+\label{tab:contrib}
+\begin{tabularx}{\linewidth}{|p{3.2cm}|X|X|}
+\hline
+\textbf{Hạng mục} & \textbf{Hoàng} & \textbf{Dương} \\ \hline
+Chủ đề DBMS & iv, v, vi & i, ii, iii \\ \hline
+Chức năng ứng dụng & FR3, FR4, FR6, FR9, nhật ký truy cập & FR1, FR2, FR5, FR7, FR8 \\ \hline
+DB Lab & Tab iv--vi & Tab i--iii \\ \hline
+Hạ tầng \& quy trình & Docker, skeleton, auth, quy trình Git, bộ đo hiệu năng, kiểm thử & Mô hình Cassandra, bộ sinh dữ liệu lớn \\ \hline
+Báo cáo & Mục 1, 2.1, 3.4--3.6, 4.1, 4.2, 4.4, 4.6, 4.7, 5, Phụ lục & Mục 2.2, 3.1--3.3, 4.3, 4.4, 4.5 \\ \hline
+\textbf{Tỉ lệ đóng góp tự đánh giá} & \colorbox{yellow!40}{TODO: \_\_\%} & \colorbox{yellow!40}{TODO: \_\_\%} \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Quy trình làm việc}
+\begin{itemize}
+    \item \textbf{Kế hoạch:} \texttt{docs/PLAN.md} là nguồn sự thật duy nhất về phạm vi, phân công và tiến độ. Mỗi bước có ID (ví dụ \texttt{S3.3}, \texttt{T4.3}), người phụ trách, input, output, điều kiện hoàn thành, hạn và trạng thái.
+    \item \textbf{Nhật ký công việc:} \texttt{docs/TRACKLOG.md}, mỗi người một bảng riêng, chỉ ghi thêm. Mỗi dòng trỏ tới output kiểm chứng được (file, PR, kết quả đo).
+    \item \textbf{GitHub Flow:} mỗi bước là một branch và một Pull Request, người kia review trong 24 giờ rồi squash merge; nhánh \texttt{main} được bảo vệ, không ai push thẳng. Commit và branch đều mang ID bước để truy vết. CODEOWNERS phân vùng thư mục theo người sở hữu để hai người làm song song không xung đột.
+    \item \textbf{Họp:} thứ 2 và thứ 5 hằng tuần lúc 21:00, có biên bản sau mỗi buổi (Phụ lục~\ref{app:meetings}).
+\end{itemize}
+
+\subsection{Nhật ký công việc}
+Bảng~\ref{tab:tracklog-hoang} tóm tắt nhật ký của Hoàng, trích từ \texttt{docs/TRACKLOG.md}; mỗi dòng tương ứng một commit trên GitHub.
+
+\begin{table}[H]
+\centering
+\caption{Nhật ký công việc của Hoàng}
+\label{tab:tracklog-hoang}
+\small
+\begin{tabularx}{\linewidth}{|p{1.6cm}|p{2.2cm}|X|c|}
+\hline
+\textbf{Ngày} & \textbf{Bước} & \textbf{Việc đã làm và output} & \textbf{Giờ} \\ \hline
+26/10/2026 & S0.1--S0.4 & Khởi tạo repo, Docker Compose 2 DBMS (+ cluster 3 node), quy trình Git, skeleton Express + React, đăng nhập JWT, module mẫu Khoa phòng, ghi nhật ký vào Cassandra & 3.75 \\ \hline
+26/10/2026 & S1.1, S1.2, S1.5 & Bản nháp 9 FR và ma trận 8 loại truy vấn, ERD và schema SQL Server, API contract & 2 \\ \hline
+26/10/2026 & S1.6 & Bộ đo hiệu năng dùng chung: latency, logical reads, throughput song song, xuất CSV & 1 \\ \hline
+26/10/2026 & T4.1--T4.5 & Chủ đề Transaction: 9 kịch bản trên 2 DBMS, đo torn read và chi phí transaction & 3 \\ \hline
+26/10/2026 & T5.1--T5.5 & Chủ đề Concurrency: ma trận 5 hiện tượng $\times$ 5 mức cô lập, double-booking, leo thang khoá, deadlock, last-write-wins, tunable consistency & 3 \\ \hline
+26/10/2026 & T6.1--T6.5 & Chủ đề Backup \& recovery: recovery model, chuỗi sao lưu, point-in-time restore, crash recovery, snapshot, replication $\neq$ backup, Agent job & 3 \\ \hline
+26/10/2026 & S3.3, S3.4, S3.6, S3.9, S3.11, S3.12 & Backend và giao diện FR3, FR4, FR6, FR9, nhật ký truy cập, DB Lab iv--vi; 14 test E2E, kiểm thử giao diện headless & 8 \\ \hline
+26/10/2026 & S4.1, S5.1--S5.4 & Checklist test chéo 24 ca, bản nháp báo cáo, 9 ảnh giao diện, chuẩn bị họp kickoff & 2 \\ \hline
+\end{tabularx}
+\end{table}
+
+\todo{Dương}{Bảng nhật ký công việc của Dương (cùng định dạng Bảng~\ref{tab:tracklog-hoang}).}
+
+\subsection{Các buổi họp}
+
+\begin{table}[H]
+\centering
+\caption{Danh sách các buổi họp}
+\label{tab:meetings}
+\begin{tabularx}{\linewidth}{|c|p{2.2cm}|X|}
+\hline
+\textbf{\#} & \textbf{Ngày} & \textbf{Nội dung chính} \\ \hline
+1 & 26/10/2026 & Kickoff: chốt DBMS, chủ đề, phân công, timeline, quy trình; Hoàng báo cáo phần đã làm; Dương chạy repo trên máy mình \\ \hline
+\multicolumn{3}{|l|}{\colorbox{yellow!40}{TODO: bổ sung các buổi họp tiếp theo}} \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Khó khăn và cách xử lý}
+
+\begin{table}[H]
+\centering
+\caption{Khó khăn và cách xử lý}
+\begin{tabularx}{\linewidth}{|X|X|}
+\hline
+\textbf{Khó khăn} & \textbf{Cách xử lý} \\ \hline
+2 người làm khối lượng của nhóm 4--5 người & Ưu tiên theo MoSCoW, phân vùng sở hữu thư mục để làm song song không xung đột \\ \hline
+Script demo gây hỏng dữ liệu khi một bước lỗi (backup) & Dừng ở lỗi đầu tiên, kiểm tra điều kiện trước các bước có thể làm mất dữ liệu, tự khôi phục dữ liệu trong ứng dụng (Mục~\ref{sec:backup}) \\ \hline
+Gỡ cluster Cassandra sai cách làm mất dữ liệu dev & Script gỡ dùng \texttt{decommission -{}-force}, dừng nếu lỗi, đã kiểm chứng giữ đủ dữ liệu \\ \hline
+\texttt{db:init} lỗi timeout vì Cassandra khởi động chậm & \texttt{db:up} chờ container \textit{healthy} (\texttt{-{}-wait}); \texttt{db:init} tự thử kết nối lại tới 3 phút \\ \hline
+\end{tabularx}
+\end{table}

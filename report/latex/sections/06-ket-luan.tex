@@ -1,0 +1,51 @@
+\section{Kết luận và tự đánh giá}
+\label{sec:conclusion}
+
+\subsection{Kết luận}
+Kết quả thực nghiệm trên sáu chủ đề cho thấy hai hệ quản trị có thế mạnh ở các nhóm dữ liệu khác nhau của phòng khám, do đó hệ thống sử dụng đồng thời cả hai với vai trò như sau:
+
+\begin{itemize}
+    \item \textbf{Dữ liệu lâm sàng và tài chính} (lịch hẹn, lượt khám, đơn thuốc, tồn kho, hoá đơn) nên đặt trên \textbf{SQL Server}. Các nghiệp vụ này bắt buộc atomic trên nhiều bảng (Mục~\ref{sec:transaction}), có tài nguyên khan hiếm bị nhiều người tranh như khung giờ khám và tồn kho (Mục~\ref{sec:concurrency}), và cần khôi phục tới từng giây khi người dùng thao tác nhầm (Mục~\ref{sec:backup}). Cassandra không có transaction nhiều partition, không có rollback, và nếu không dùng LWT thì các yêu cầu ghi đồng thời ghi đè lên nhau mà không báo lỗi.
+    \item \textbf{Dữ liệu thiết bị và hệ thống} (sinh hiệu, nhật ký truy cập) phù hợp với \textbf{Cassandra}. Dữ liệu chỉ ghi thêm, mỗi bệnh nhân có một nguồn ghi nên last-write-wins chấp nhận được, chỉ cần atomic trong một lần đo (logged batch), và cần \textit{luôn ghi được} kể cả khi mất một node nhờ replication. Throughput ghi của Cassandra cao hơn SQL Server nhiều lần ở cùng điều kiện (Bảng~\ref{tab:tx-cost}).
+    \item Khi dữ liệu quan trọng buộc phải nằm trên Cassandra, phải dùng consistency QUORUM cho cả đọc lẫn ghi: thí nghiệm ở Bảng~\ref{tab:consistency} cho thấy đọc ở mức ONE bỏ sót thông tin dị ứng 3/5 lần.
+\end{itemize}
+
+Ứng dụng của nhóm hiện thực cách phân chia này theo mô hình \textit{polyglot persistence}: 8 chức năng nghiệp vụ trên SQL Server, sinh hiệu và nhật ký trên Cassandra. Các kỹ thuật rút ra từ thí nghiệm được dùng trực tiếp trong chức năng thật (khoá \texttt{UPDLOCK + HOLDLOCK} khi đặt lịch, trừ kho bằng một câu \texttt{UPDATE} có điều kiện, logged batch và \texttt{USING TIMESTAMP} cho sinh hiệu), và trang DB Lab cho phép chạy lại các thí nghiệm ngay trong ứng dụng.
+
+\todo{Dương}{Bổ sung kết luận từ chủ đề i--iii (lưu trữ, chỉ mục, xử lý truy vấn) vào đoạn trên.}
+
+\subsection{Tự đánh giá theo tiêu chí chấm điểm}
+
+\begin{table}[H]
+\centering
+\caption{Tự đánh giá theo rubric}
+\label{tab:self-assessment}
+\begin{tabularx}{\linewidth}{|p{2.8cm}|c|X|c|}
+\hline
+\textbf{Tiêu chí} & \textbf{Trọng số} & \textbf{Minh chứng} & \textbf{Tự chấm} \\ \hline
+Structure & 10\% & 6 mục (trong giới hạn 4--7), có Giới thiệu, Kết luận kèm tự đánh giá, Tài liệu tham khảo; phụ lục tách riêng & TODO \\ \hline
+Content & 10\% & Ma trận truy vết ở Phụ lục~\ref{app:trace}: mọi yêu cầu của đề đều trỏ tới mục báo cáo và mã nguồn & TODO \\ \hline
+Presentation & 10\% & Mỗi thành viên trình bày phần mình; demo trực tiếp trên DB Lab, có video dự phòng & TODO \\ \hline
+Teamwork & 10\% & Bảng phân công và nhật ký công việc (Mục~\ref{sec:teamwork}), quy trình PR có review, biên bản họp ở Phụ lục~\ref{app:meetings} & TODO \\ \hline
+Demonstration & 30\% & 6/6 chủ đề, mỗi chủ đề chạy trên cả hai DBMS, có số đo, bảng so sánh và kết luận; script chạy lại được & TODO \\ \hline
+Application & 30\% & 9 chức năng (đề yêu cầu 4), đủ 8 loại truy vấn, kiến trúc n-tier phân lớp, validation, thông báo lỗi tiếng Việt, phân quyền, 14/14 test E2E đạt & TODO \\ \hline
+Bonus & +2 & 4 chủ đề vượt yêu cầu; DB Lab đưa toàn bộ thí nghiệm vào ứng dụng & TODO \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Hạn chế và hướng phát triển}
+\textbf{Hạn chế:}
+\begin{itemize}
+    \item Mọi thí nghiệm chạy trên một máy, các node Cassandra là container trên cùng máy chủ. Độ trễ mạng giữa các node gần như bằng 0, nên số đo throughput và độ trễ của Cassandra lạc quan hơn một cụm thật.
+    \item Các thí nghiệm đồng thời dùng số client nhỏ (tối đa 50); chưa đo hành vi khi tải kéo dài nhiều giờ.
+    \item SQL Server chạy một instance, chưa thử nghiệm giải pháp sẵn sàng cao (Always On, log shipping), nên phần so sánh ``mất máy chủ'' ở Bảng~\ref{tab:backup-compare} dựa trên tài liệu.
+\end{itemize}
+
+\textbf{Hướng phát triển:}
+\begin{itemize}
+    \item Triển khai Cassandra trên nhiều máy thật để đo ảnh hưởng của độ trễ mạng lên các mức consistency.
+    \item Bổ sung Always On Availability Group cho SQL Server và so sánh RPO/RTO khi mất máy chủ với replication của Cassandra.
+    \item Đồng bộ dữ liệu giữa hai DBMS bằng cơ chế change data capture thay vì liên kết qua khoá ở tầng ứng dụng.
+\end{itemize}
+
+\todo{Dương}{Bổ sung hạn chế và hướng phát triển của chủ đề i--iii và FR1, FR2, FR5, FR7, FR8.}
