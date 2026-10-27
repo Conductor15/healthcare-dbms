@@ -15,8 +15,9 @@ services:
     ports:
       - "1433:1433"
     volumes:
+      # also holds /var/opt/mssql/backup (topic vi), created by SQL Server itself via xp_create_subdir
+      # so it is owned by the mssql user (a separate volume would be root-owned → "Access is denied")
       - mssql-data:/var/opt/mssql
-      - mssql-backup:/var/opt/mssql/backup   # topic vi: BACKUP DATABASE ... TO DISK = '/var/opt/mssql/backup/...'
     healthcheck:
       test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' -b -o /dev/null"]
       interval: 10s
@@ -72,7 +73,6 @@ services:
 
 volumes:
   mssql-data:
-  mssql-backup:
   cassandra-data:
   cassandra2-data:
   cassandra3-data:

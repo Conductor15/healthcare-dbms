@@ -1,0 +1,17 @@
+Processed 896 pages for database 'HealthcareDB', file 'HealthcareDB' on file 1.
+Processed 2 pages for database 'HealthcareDB', file 'HealthcareDB_log' on file 1.
+BACKUP DATABASE successfully processed 898 pages in 0.113 seconds (62.050 MB/sec).
+--- 1. Ngay sau full backup
+recovery_model_desc log_reuse_wait_desc log_used_mb log_used_pct
+------------------- ------------------- ----------- ------------
+FULL NOTHING 3.85 5.3
+--- 2. Sau 20 000 insert + update + CHECKPOINT: log KHÔNG được giải phóng (chờ LOG_BACKUP)
+recovery_model_desc log_reuse_wait_desc log_used_mb log_used_pct
+------------------- ------------------- ----------- ------------
+FULL LOG_BACKUP 28.50 39.6
+Processed 3164 pages for database 'HealthcareDB', file 'HealthcareDB_log' on file 1.
+BACKUP LOG successfully processed 3164 pages in 0.037 seconds (667.968 MB/sec).
+--- 3. Sau BACKUP LOG: phần log đã sao lưu được tái sử dụng
+recovery_model_desc log_reuse_wait_desc log_used_mb log_used_pct
+------------------- ------------------- ----------- ------------
+FULL NOTHING 12.55 17.4

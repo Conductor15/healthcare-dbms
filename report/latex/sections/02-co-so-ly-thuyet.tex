@@ -1,0 +1,68 @@
+\section{Tổng quan hai DBMS và môi trường thực nghiệm}
+\label{sec:background}
+
+\subsection{Microsoft SQL Server 2022}
+
+\subsubsection{Kiến trúc tổng quan}
+SQL Server là hệ quản trị cơ sở dữ liệu quan hệ của Microsoft, dùng ngôn ngữ T-SQL. Một instance SQL Server gồm hai thành phần chính~\cite{silberschatz}:
+\begin{itemize}
+    \item \textbf{Relational Engine (Query Processor)}: phân tích câu lệnh, tối ưu hoá dựa trên chi phí (cost-based optimizer) với thống kê dữ liệu, sinh và lưu kế hoạch thực thi (plan cache), điều phối việc thực thi.
+    \item \textbf{Storage Engine}: quản lý truy cập dữ liệu (heap, B$^+$-tree), bộ đệm (buffer pool), khoá (lock manager), phiên bản dòng (version store) và transaction log.
+\end{itemize}
+Bên dưới là lớp SQLOS lo lập lịch luồng, quản lý bộ nhớ và phát hiện deadlock.
+
+\subsubsection{Tổ chức lưu trữ}
+Mỗi cơ sở dữ liệu có ít nhất một file dữ liệu (\texttt{.mdf}, \texttt{.ndf}) và một file log (\texttt{.ldf}). File dữ liệu được chia thành các \textbf{trang 8 KB}; 8 trang liên tiếp tạo thành một \textbf{extent 64 KB}~\cite{mssql-pages}. Bảng được lưu dưới dạng heap hoặc clustered index (B$^+$-tree theo khoá clustered); nonclustered index là các B$^+$-tree riêng trỏ về dòng dữ liệu. Chi tiết lưu trữ và chỉ mục được phân tích trong Mục~\ref{sec:storage} và Mục~\ref{sec:indexing}.
+
+File log ghi tuần tự, chia thành các \textit{virtual log file}. Mỗi thay đổi dữ liệu được ghi vào log trước (\textit{write-ahead logging}) rồi mới sửa trang trong buffer pool; trang bẩn được ghi xuống đĩa sau, ở checkpoint hoặc bởi lazy writer~\cite{mssql-txlog}. Cơ chế này là nền tảng cho transaction (Mục~\ref{sec:transaction}) và phục hồi (Mục~\ref{sec:backup}).
+
+\subsubsection{Giao dịch, đồng thời và phục hồi}
+\begin{itemize}
+    \item \textbf{Transaction} đầy đủ ACID trên nhiều câu lệnh, nhiều bảng; hỗ trợ savepoint và xử lý lỗi \texttt{TRY\ldots CATCH}.
+    \item \textbf{Điều khiển đồng thời} kết hợp hai cơ chế: khoá nhiều mức độ (KEY, PAGE, OBJECT) với leo thang khoá, và \textit{row versioning} (SNAPSHOT, READ COMMITTED SNAPSHOT) lưu phiên bản cũ trong tempdb~\cite{mssql-locking}. Có 4 mức cô lập theo chuẩn ANSI cộng mức SNAPSHOT.
+    \item \textbf{Phục hồi}: crash recovery tự động theo họ thuật toán ARIES~\cite{aries}; ba \textit{recovery model} (SIMPLE, BULK\_LOGGED, FULL) quyết định log được giữ bao lâu và có khôi phục tới một thời điểm được hay không~\cite{mssql-recovery}. SQL Server Agent lập lịch các job sao lưu.
+\end{itemize}
+
+\subsubsection{Các tính năng được dùng trong đề tài}
+
+\begin{table}[H]
+\centering
+\caption{Tính năng SQL Server được sử dụng}
+\label{tab:mssql-features}
+\begin{tabularx}{\linewidth}{|p{4.6cm}|X|}
+\hline
+\textbf{Tính năng} & \textbf{Dùng ở đâu} \\ \hline
+Transaction, \texttt{XACT\_ABORT}, savepoint & Thí nghiệm Mục~\ref{sec:transaction}; đặt lịch (FR3), khám bệnh (FR4) \\ \hline
+Mức cô lập, table hint \texttt{UPDLOCK}, \texttt{HOLDLOCK} & Thí nghiệm Mục~\ref{sec:concurrency}; chống đặt trùng lịch (FR3) \\ \hline
+Filtered UNIQUE index, \texttt{CHECK} constraint & Lớp chặn cuối cho lịch hẹn; tồn kho không âm \\ \hline
+\texttt{UPDATE \ldots{} OUTPUT} & Trừ tồn kho và lấy giá thuốc trong một câu (FR4) \\ \hline
+DMV \texttt{sys.dm\_tran\_locks}, \texttt{fn\_dblog} & Quan sát khoá, deadlock, bản ghi log \\ \hline
+\texttt{BACKUP}/\texttt{RESTORE \ldots{} STOPAT}, SQL Server Agent & Thí nghiệm Mục~\ref{sec:backup}; DB Lab \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Apache Cassandra 5.0}
+\todo{Dương}{Kiến trúc phân tán (ring, partitioner, replication), mô hình wide-column, đường ghi (commit log $\rightarrow$ memtable $\rightarrow$ SSTable), thiết kế theo truy vấn.}
+
+\subsection{Môi trường thực nghiệm}
+Toàn bộ thực nghiệm và ứng dụng chạy trên Docker Compose, nên cả hai thành viên có môi trường giống hệt nhau. Lệnh \texttt{npm run db:init} tạo lại cơ sở dữ liệu từ các script trong thư mục \texttt{database/}.
+
+\begin{table}[H]
+\centering
+\caption{Cấu hình môi trường thực nghiệm}
+\label{tab:env}
+\begin{tabularx}{\linewidth}{|p{3.5cm}|X|}
+\hline
+\textbf{Thành phần} & \textbf{Cấu hình} \\ \hline
+Máy thực nghiệm & AMD Ryzen 7 6800H (8 nhân, 16 luồng), RAM 32 GB, SSD NVMe Samsung 512 GB, Windows 11 \\ \hline
+Docker & Docker Desktop 29.6 trên WSL2, cấp 16 CPU và 16 GB RAM \\ \hline
+SQL Server & Image \texttt{mssql/server:2022-latest}, bản Developer, bật SQL Server Agent, 1 container \\ \hline
+Cassandra & Image \texttt{cassandra:5.0}, heap 1 GB, datacenter \texttt{dc1}. Mặc định 1 node; bật thêm 2 node (\texttt{-{}-profile cluster}) cho các thí nghiệm consistency và replication \\ \hline
+Ứng dụng & Node.js 24, Express 5; React 19, Ant Design 6, Vite 7 \\ \hline
+Bộ đo hiệu năng & \texttt{demos/\_common/bench.js}: chạy truy vấn $N$ lần trên 2 DB, xuất CSV (min/avg/p50/p95, logical reads, throughput song song) \\ \hline
+\end{tabularx}
+\end{table}
+
+Các thí nghiệm ở Mục~\ref{sec:transaction}--\ref{sec:backup} dùng dữ liệu mẫu do \texttt{npm run db:init} tạo ra, cộng với dữ liệu do chính script thí nghiệm sinh thêm (ví dụ 20\,000 dòng cho thí nghiệm log, 10\,000 dòng cho leo thang khoá).
+
+\todo{Dương}{Mô tả bộ dữ liệu lớn (S1.4): số bệnh nhân, lượt khám, bản ghi sinh hiệu ở từng mức scale.}

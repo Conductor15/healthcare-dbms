@@ -1,0 +1,10 @@
+step,result
+"1. 100 bản ghi sinh hiệu, flush ra SSTable",100 dòng
+"2. nodetool snapshot -t daily (hard link, không copy)",953 ms
+   Các file trong snapshot,1 SSTable
+"3. Bật incremental backup, ghi thêm 20 bản ghi, flush",120 dòng
+   Thư mục backups/ (SSTable mới được hard-link),1 SSTable
+4. Sự cố: TRUNCATE,0 dòng
+   auto_snapshot cũng tự chụp trước khi TRUNCATE,"truncated-1792986575099-vitals, daily"
+"5. nodetool import từ snapshot ""daily""",100 dòng (mất 20 bản ghi sau snapshot)
+6. nodetool import thêm từ incremental backups/,120 dòng

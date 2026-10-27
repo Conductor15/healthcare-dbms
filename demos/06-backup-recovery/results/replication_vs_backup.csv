@@ -1,0 +1,7 @@
+step,result
+"1. 3 hồ sơ dị ứng, ghi CONSISTENCY ALL (có trên cả 3 node)",3 dòng
+2. Node 2 chết → vẫn đọc được với QUORUM (high availability),3 dòng
+3. TRUNCATE khi node 2 chết,bị từ chối: TRUNCATE cần TẤT CẢ replica sống
+4. nodetool snapshot -t before_mistake trên TỪNG node,OK (3 snapshot)
+5. Lỡ tay TRUNCATE (cả 3 node sống) → đọc ALL,0 dòng: replication đã nhân bản cả lỗi
+6. nodetool import --copy-data từ snapshot trên từng node → đọc ALL,3 dòng

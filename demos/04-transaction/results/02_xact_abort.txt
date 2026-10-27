@@ -1,0 +1,24 @@
+=== A. XACT_ABORT OFF (mặc định) ===
+medicine_id name stock_quantity
+----------- ---- --------------
+1 Paracetamol 500mg 5000
+9 Salbutamol xịt 100mcg 60
+Msg 547, Level 16, State 1, Server f4c49ae72ed9, Line 15
+The UPDATE statement conflicted with the CHECK constraint "CK_medicines_stock". The conflict occurred in database "HealthcareDB", table "dbo.medicines", column 'stock_quantity'.
+The statement has been terminated.
+Sau lỗi: @@TRANCOUNT = 1 → transaction VẪN MỞ
+Kết quả: Paracetamol bị trừ 10 nhưng Salbutamol không → dữ liệu nửa vời đã được COMMIT
+medicine_id name stock_quantity
+----------- ---- --------------
+1 Paracetamol 500mg 4990
+9 Salbutamol xịt 100mcg 60
+ 
+=== B. XACT_ABORT ON ===
+Msg 547, Level 16, State 1, Server f4c49ae72ed9, Line 7
+The UPDATE statement conflicted with the CHECK constraint "CK_medicines_stock". The conflict occurred in database "HealthcareDB", table "dbo.medicines", column 'stock_quantity'.
+@@TRANCOUNT = 0 → SQL Server đã tự ROLLBACK toàn bộ
+medicine_id name stock_quantity
+----------- ---- --------------
+1 Paracetamol 500mg 5000
+9 Salbutamol xịt 100mcg 60
+=> Bài học: luôn SET XACT_ABORT ON (hoặc TRY/CATCH + ROLLBACK). Ứng dụng của nhóm dùng withTransaction() rollback mọi lỗi.

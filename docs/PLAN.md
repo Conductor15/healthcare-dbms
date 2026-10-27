@@ -109,7 +109,7 @@ Mỗi step = 1 GitHub Issue (template "Step") + ≥1 PR. Tên branch chứa step
 | S0.2 | Môi trường Docker | Hoàng | — | `docker-compose.yml`, `.env.example` | `docker compose up -d` → 2 container *healthy* trên cả 2 máy | 27/10 | 🟨 |
 | S0.3 | Quy trình Git & quy ước | Hoàng | — | `CONTRIBUTING.md`, `.github/` (PR/Issue template, CODEOWNERS), branch protection `main` | Rule bật trên GitHub, Dương đọc xong | 27/10 | 🟨 |
 | S0.4 | Skeleton backend + frontend, module mẫu *Khoa phòng*, auth, access log | Hoàng | S1.2 | `server/`, `client/`, module `departments` | Đăng nhập được; CRUD khoa chạy end-to-end; `/api/health` báo 2 DB OK | 28/10 | 🟨 |
-| S0.5 | Họp kickoff + biên bản #1 | Cả 2 | `PLAN.md` | `docs/meetings/2026-10-27-kickoff.md` | Chốt plan, deadline, topic chính, lịch họp | 27/10 | ⬜ |
+| S0.5 | Họp kickoff + biên bản #1 | Cả 2 | `PLAN.md` | `docs/meetings/2026-10-26-kickoff.md` | Chốt plan, deadline, topic chính, lịch họp | 26/10 | ⬜ |
 | S0.6 | Onboard Dương | Dương | `README.md` | PR đầu tiên (ghi TRACKLOG) được merge | App chạy trên máy Dương | 28/10 | ⬜ |
 
 ### Phase 1: Thiết kế
@@ -121,7 +121,7 @@ Mỗi step = 1 GitHub Issue (template "Step") + ≥1 PR. Tên branch chứa step
 | S1.3 | Data model Cassandra (query-first) | Dương (Hoàng review) | S1.1, bản nháp của Hoàng | `database/cassandra/01_schema.cql` + mục Cassandra trong `erd.md` | Mỗi bảng phục vụ ≥1 query, không query nào cần `ALLOW FILTERING` | 29/10 | 🟦 |
 | S1.4 | Bộ sinh dữ liệu lớn | Dương | S1.2, S1.3 | `server/scripts/generate-data.js` (`npm run db:generate -- --scale=1`) | Scale 1 = 100k bệnh nhân, ~300k lượt khám, ≥5M bản ghi sinh hiệu; có tham số scale | 31/10 | ⬜ |
 | S1.5 | API contract | Hoàng | S1.1 | `docs/design/api.md` | Mọi FR có endpoint + request/response mẫu | 29/10 | 🟨 |
-| S1.6 | Bench harness dùng chung | Hoàng | — | `demos/_common/bench.js` (chạy query N lần trên 2 DB, xuất CSV: min/avg/p95) | 6 topic dùng chung một cách đo | 31/10 | ⬜ |
+| S1.6 | Bench harness dùng chung | Hoàng | — | `demos/_common/bench.js` (chạy query N lần trên 2 DB, xuất CSV: min/avg/p95) | 6 topic dùng chung một cách đo | 31/10 | 🟩 |
 
 ### Phase 2: Demo 6 topic (trên **cả hai** DBMS)
 
@@ -141,9 +141,9 @@ Mỗi topic đi qua 6 bước con giống nhau. Chi tiết kịch bản nằm tr
 | T1 | i. Data storage & management | Dương | 30/10 | 30/10 | 01/11 | 03/11 | 04/11 | 05/11 | ⬜ |
 | T2 | ii. Indexing *(topic chính)* | Dương | 02/11 | 03/11 | 05/11 | 07/11 | 08/11 | 09/11 | ⬜ |
 | T3 | iii. Query processing | Dương | 06/11 | 07/11 | 09/11 | 10/11 | 11/11 | 12/11 | ⬜ |
-| T4 | iv. Transaction *(topic chính)* | Hoàng | 30/10 | 30/10 | 01/11 | 03/11 | 04/11 | 05/11 | ⬜ |
-| T5 | v. Concurrency control | Hoàng | 02/11 | 03/11 | 05/11 | 07/11 | 08/11 | 09/11 | ⬜ |
-| T6 | vi. Data backup & recovery | Hoàng | 06/11 | 07/11 | 09/11 | 10/11 | 11/11 | 12/11 | ⬜ |
+| T4 | iv. Transaction *(topic chính)* | Hoàng | 30/10 | 30/10 | 01/11 | 03/11 | 04/11 | 05/11 | 🟩 T4.1–T4.5 |
+| T5 | v. Concurrency control | Hoàng | 02/11 | 03/11 | 05/11 | 07/11 | 08/11 | 09/11 | 🟩 T5.1–T5.5 |
+| T6 | vi. Data backup & recovery | Hoàng | 06/11 | 07/11 | 09/11 | 10/11 | 11/11 | 12/11 | 🟩 T6.1–T6.5 |
 
 > Khi cập nhật, ghi step con dạng `T4.3` trong TRACKLOG/PR (= Topic iv, bước SQL Server).
 
@@ -154,22 +154,22 @@ Mỗi topic đi qua 6 bước con giống nhau. Chi tiết kịch bản nằm tr
 | S3.0 | Đăng nhập + phân quyền (ADMIN / RECEPTIONIST / DOCTOR) | Hoàng | — | SQL Server | S0.4 | `modules/auth`, trang Login | 28/10 | 🟨 |
 | S3.1 | FR1 Quản lý hồ sơ bệnh nhân | Dương | a, b, c, d | SQL Server | S1.5 | `modules/patients`, `pages/patients` | 01/11 | ⬜ |
 | S3.2 | FR2 Quản lý bác sĩ (khoa phòng đã có mẫu) | Dương | a, b, c | SQL Server | S0.4 | `modules/doctors`, `pages/doctors` | 03/11 | ⬜ |
-| S3.3 | FR3 Đặt lịch / huỷ lịch hẹn (**transaction + chống double-booking**) | Hoàng | a, b, c, e | SQL Server | S1.5, T4, T5 | `modules/appointments`, `pages/appointments` | 03/11 | ⬜ |
-| S3.4 | FR4 Khám bệnh + kê đơn + hoá đơn (**transaction nhiều bảng, trừ tồn kho**) | Hoàng | a, c | SQL Server | S3.3 | `modules/visits`, `pages/visits` | 06/11 | ⬜ |
+| S3.3 | FR3 Đặt lịch / huỷ lịch hẹn (**transaction + chống double-booking**) | Hoàng | a, b, c, e | SQL Server | S1.5, T4, T5 | `modules/appointments`, `pages/appointments` | 03/11 | 🟩 |
+| S3.4 | FR4 Khám bệnh + kê đơn + hoá đơn (**transaction nhiều bảng, trừ tồn kho**) | Hoàng | a, c | SQL Server | S3.3 | `modules/visits`, `pages/visits` | 06/11 | 🟩 |
 | S3.5 | FR5 Tìm kiếm bệnh nhân đa điều kiện | Dương | e | SQL Server | S3.1, T2 | `GET /patients/search`, trang Tra cứu | 05/11 | ⬜ |
-| S3.6 | FR6 Chi tiết lượt khám (join 8 bảng) | Hoàng | f | SQL Server | S3.4 | `GET /visits/:id`, drawer chi tiết | 07/11 | ⬜ |
+| S3.6 | FR6 Chi tiết lượt khám (join 10 bảng) | Hoàng | f | SQL Server | S3.4 | `GET /visits/:id`, drawer chi tiết | 07/11 | 🟩 |
 | S3.7 | FR7 Dashboard thống kê | Dương | h | SQL Server | S1.4 | `modules/stats`, `pages/dashboard` (biểu đồ) | 08/11 | ⬜ |
 | S3.8 | FR8 Truy vấn nâng cao | Dương | g | SQL Server | S1.4 | `modules/insights`, `pages/insights` | 10/11 | ⬜ |
-| S3.9 | FR9 Sinh hiệu real-time (SSE) + cảnh báo bất thường | Hoàng | a, d | **Cassandra** | S1.3 | `modules/vitals`, `pages/vitals`, trình giả lập thiết bị | 10/11 | ⬜ |
+| S3.9 | FR9 Sinh hiệu real-time (SSE) + cảnh báo bất thường | Hoàng | a, d | **Cassandra** | S1.3 | `modules/vitals`, `pages/vitals`, trình giả lập thiết bị | 10/11 | 🟩 |
 | S3.10 | DB Lab: Storage / Index / Query plan | Dương | — | Cả 2 | T1–T3 | `modules/lab` (phần i–iii), `pages/db-lab` | 13/11 | ⬜ |
-| S3.11 | DB Lab: Transaction / Concurrency / Backup | Hoàng | — | Cả 2 | T4–T6 | `modules/lab` (phần iv–vi) | 13/11 | ⬜ |
-| S3.12 | Ghi access log mọi request vào Cassandra + trang xem log (ADMIN) | Hoàng | a, d | **Cassandra** | S0.4 | `middleware/access-log.js`, trang Nhật ký | 10/11 | 🟦 |
+| S3.11 | DB Lab: Transaction / Concurrency / Backup | Hoàng | — | Cả 2 | T4–T6 | `modules/lab` (phần iv–vi) | 13/11 | 🟩 |
+| S3.12 | Ghi access log mọi request vào Cassandra + trang xem log (ADMIN) | Hoàng | a, d | **Cassandra** | S0.4 | `middleware/access-log.js`, trang Nhật ký | 10/11 | 🟩 |
 
 ### Phase 4: Tích hợp & kiểm thử
 
 | ID | Việc | Owner | Input | Output | Done khi | Hạn | Status |
 |---|---|---|---|---|---|---|---|
-| S4.1 | Checklist kiểm thử E2E: 9 FR × 8 query type | Hoàng | Phase 3 | `docs/testing/checklist.md` | Có cột người test + kết quả | 11/11 | ⬜ |
+| S4.1 | Checklist kiểm thử E2E: 9 FR × 8 query type | Hoàng | Phase 3 | `docs/testing/checklist.md` | Có cột người test + kết quả | 11/11 | 🟩 |
 | S4.2 | **Test chéo**: Dương test FR của Hoàng và ngược lại | Cả 2 | S4.1 | Issue bug gắn nhãn `bug` | Không còn bug mức High | 14/11 | ⬜ |
 | S4.3 | Hoàn thiện UX (empty state, loading, validation, responsive) | Theo owner FR | S4.2 | PR | Checklist UX trong S4.1 pass | 14/11 | ⬜ |
 | S4.4 | Code freeze + tag `v1.0` + hướng dẫn cài đặt | Hoàng | S4.3 | Git tag, `README.md` | Cài mới từ đầu trên máy Dương chạy được | 15/11 | ⬜ |

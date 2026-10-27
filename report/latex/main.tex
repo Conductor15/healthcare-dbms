@@ -1,0 +1,150 @@
+\documentclass[a4paper]{article}
+\usepackage{a4wide,amssymb,latexsym,multicol,array,hhline,fancyhdr}
+\usepackage{vntex}
+\usepackage{amsmath}
+\usepackage{lastpage}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{tabularx, caption}
+\usepackage{multirow}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{tikz}
+\usepackage{indentfirst}
+\usetikzlibrary{shapes, arrows, positioning, fit, calc, backgrounds}
+\usepackage{float}
+\usepackage[backend=bibtex,style=ieee]{biblatex}
+\addbibresource{references.bib}
+\usepackage[colorlinks]{hyperref}
+
+\graphicspath{{images/}{figures/}}
+
+% Màu và style code
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.6,0.2,0.6}
+\definecolor{backcolor}{rgb}{0.95,0.95,0.95}
+\def\labelitemi{--}
+
+\lstdefinestyle{custom}{
+    backgroundcolor=\color{backcolor},
+    commentstyle=\color{codegray},
+    keywordstyle=\color{blue},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numberstyle=\tiny\color{codegray},
+    showstringspaces=false,
+    tabsize=2
+}
+\lstset{style=custom}
+
+% FORMATTING
+\captionsetup[table]{name=Bảng}
+\captionsetup[figure]{name=Hình}
+\hypersetup{urlcolor=blue,linkcolor=black,citecolor=black,colorlinks=true}
+\renewcommand{\arraystretch}{1.3}
+
+% Ô đánh dấu phần chưa viết: \todo{Người phụ trách}{Nội dung cần viết}
+\newcommand{\todo}[2]{%
+  \par\noindent\fcolorbox{red}{yellow!25}{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{%
+    \textbf{\color{red}TODO (#1):} #2}}\par\medskip}
+
+% HEADER AND FOOTER
+\setlength{\headheight}{40pt}
+\pagestyle{fancy}
+\fancyhead{}
+\fancyhead[L]{
+ \begin{tabular}{rl}
+    \begin{picture}(25,15)(0,0)
+    \put(0,-8){\includegraphics[width=10mm, height=10mm]{hcmut.jpg}}
+   \end{picture}&
+    \begin{tabular}{l}
+        \textbf{\bf \ttfamily Ho Chi Minh City University of Technology}\\
+        \textbf{\bf \ttfamily Faculty of Computer Science and Engineering}
+    \end{tabular}
+ \end{tabular}
+}
+\fancyfoot{}
+\fancyfoot[L]{\scriptsize \ttfamily Báo cáo Bài tập lớn Hệ quản trị Cơ sở dữ liệu - HK261}
+\fancyfoot[R]{\scriptsize \ttfamily Trang {\thepage}/\pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.3pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+
+\begin{document}
+
+% BÌA BÁO CÁO
+\begin{titlepage}
+\begin{tikzpicture}[remember picture,overlay]
+  \draw[line width=2pt]
+    ($(current page.north west) + (1cm,-1cm)$) rectangle
+    ($(current page.south east) + (-1cm,1cm)$);
+\end{tikzpicture}
+\begin{center}
+{\Large \textbf{ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH}}\\[0.3cm]
+    {\Large \textbf{TRƯỜNG ĐẠI HỌC BÁCH KHOA}}\\[0.3cm]
+    {\large \textbf{KHOA KHOA HỌC VÀ KỸ THUẬT MÁY TÍNH}}\\[1cm]
+\end{center}
+
+\vspace{0.5cm}
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=4cm]{hcmut.jpg}
+\end{center}
+\end{figure}
+\vspace{0.5cm}
+\begin{flushleft}
+    \large \textbf{BÀI TẬP LỚN HỆ QUẢN TRỊ CƠ SỞ DỮ LIỆU} \\
+    \rule{\linewidth}{0.3pt} \\
+    \begin{center}
+        \huge \textbf{Hệ thống Quản lý Phòng khám Đa khoa kết hợp SQL Server và Cassandra} \\
+        \rule{\linewidth}{0.3pt}
+    \end{center}
+\end{flushleft}
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.7}
+\setlength{\tabcolsep}{10pt}
+\begin{tabular}{ll}
+\textbf{Giảng viên hướng dẫn:} & \colorbox{yellow!40}{TODO: tên GVHD} \\
+\textbf{Lớp:} & L01 \\
+\textbf{Sinh viên thực hiện:} & Nguyễn Thái Vũ Hoàng - 2311063 \\
+& \colorbox{yellow!40}{TODO: họ tên Dương - MSSV} \\
+\textbf{Mã nguồn (GitHub):} & \href{https://github.com/Conductor15/healthcare-dbms}{\color{blue}\underline{Truy cập tại đây}} \\
+\end{tabular}
+\end{table}
+
+\begin{center}
+{\footnotesize TP. HỒ CHÍ MINH, THÁNG 11 NĂM 2026}
+\end{center}
+\end{titlepage}
+
+% MỤC LỤC
+\tableofcontents
+\newpage
+
+\input{sections/01-gioi-thieu}
+\input{sections/02-co-so-ly-thuyet}
+\input{sections/03-thuc-nghiem}
+\input{sections/04-ung-dung}
+\input{sections/05-lam-viec-nhom}
+\input{sections/06-ket-luan}
+
+\newpage
+\addcontentsline{toc}{section}{Tài liệu tham khảo}
+\printbibliography[title={Tài liệu tham khảo}]
+
+\newpage
+\appendix
+\input{sections/A-phu-luc}
+
+\end{document}

@@ -1,0 +1,7 @@
+--- Chạy thử job log backup ngay
+Job 'HC - Log backup (15 min)' started successfully.
+job schedule last_run
+--- -------- --------
+HC - Differential backup (daily) Hằng ngày, 01:00 NULL
+HC - Full backup (weekly) Hằng tuần (CN), 01:00 NULL
+HC - Log backup (15 min) Hằng ngày, mỗi 15 phút Succeeded

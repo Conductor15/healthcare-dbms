@@ -1,0 +1,8 @@
+Log records của transaction 0000:00000493:
+Current LSN Operation Context AllocUnitName bytes
+----------- --------- ------- ------------- -----
+0000002B:00000188:0001 LOP_BEGIN_XACT LCX_NULL NULL 112
+0000002B:00000188:0002 LOP_MODIFY_COLUMNS LCX_CLUSTERED dbo.medicines.PK_medicines 144
+0000002B:00000188:0003 LOP_MODIFY_COLUMNS LCX_CLUSTERED dbo.medicines.PK_medicines 144
+0000002B:00000188:0004 LOP_COMMIT_XACT LCX_NULL NULL 84
+=> COMMIT chỉ trả về khi LOP_COMMIT_XACT đã được ghi xuống đĩa (log flush). Data page ghi sau (checkpoint).

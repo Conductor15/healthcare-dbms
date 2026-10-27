@@ -1,0 +1,20 @@
+--- 1. UPDATE 100 dòng: khoá mức dòng (KEY)
+resource_type request_mode locks
+------------- ------------ -----
+DATABASE S 1
+KEY X 100
+OBJECT IX 1
+PAGE IX 1
+--- 2. UPDATE 10 000 dòng: leo thang thành khoá cả bảng (OBJECT X)
+resource_type request_mode locks
+------------- ------------ -----
+DATABASE S 1
+OBJECT X 16
+--- 3. Tắt leo thang cho bảng (LOCK_ESCALATION = DISABLE) rồi chạy lại
+resource_type request_mode locks
+------------- ------------ -----
+DATABASE S 1
+KEY X 10000
+OBJECT IX 1
+PAGE IX 39
+=> Đánh đổi: 10 000 khoá dòng tốn bộ nhớ lock manager nhưng các phiên khác vẫn làm việc được với dòng khác.

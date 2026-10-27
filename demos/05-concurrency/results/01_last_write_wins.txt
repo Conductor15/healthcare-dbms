@@ -1,0 +1,24 @@
+
+ patient_id | heart_rate | source                 | ts
+------------+------------+------------------------+---------
+          1 |        120 | device A, measured t=5 | 5000000
+
+(1 rows)
+
+ patient_id | heart_rate | source                 | ts
+------------+------------+------------------------+---------
+          1 |        120 | device A, measured t=5 | 5000000
+
+(1 rows)
+
+ patient_id | heart_rate | source                 | note                   | hr_ts   | note_ts
+------------+------------+------------------------+------------------------+---------+---------
+          1 |         95 | device A, measured t=5 | nurse: patient resting | 7000000 | 6000000
+
+(1 rows)
+
+ patient_id | heart_rate
+------------+------------
+          2 |         70
+
+(1 rows)

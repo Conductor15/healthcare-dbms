@@ -1,0 +1,10 @@
+Thuốc 1, 2: OK
+Thuốc 3 lỗi: The UPDATE statement conflicted with the CHECK constraint "CK_medicines_stock". The conflict occurred in database "HealthcareDB", table "dbo.medicines", column 'stock_quantity'.
+XACT_STATE() = 1 (1 = transaction vẫn commit được)
+→ ROLLBACK TRANSACTION before_item3: chỉ bỏ thuốc 3
+@@TRANCOUNT = 1; đơn thuốc còn lại:
+medicine_id name quantity dosage
+----------- ---- -------- ------
+1 Paracetamol 500mg 10 Uống khi sốt > 38.5°C
+8 Cetirizine 10mg 7 Tối 1 viên
+(Demo kết thúc bằng ROLLBACK để chạy lại được; trong ứng dụng sẽ là COMMIT)

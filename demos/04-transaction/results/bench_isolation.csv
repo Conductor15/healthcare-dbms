@@ -1,0 +1,7 @@
+db,name,writes,reads,tornReads,tornPct
+SQL Server,"transaction, reader READ UNCOMMITTED",526,10166,52,0.51%
+SQL Server,"transaction, reader READ COMMITTED",572,3360,5,0.15%
+SQL Server,"transaction, reader REPEATABLE READ",581,3365,0,0.00%
+SQL Server,"transaction, reader SNAPSHOT",656,11165,0,0.00%
+Cassandra,"LOGGED batch, reader ONE",2607,13351,697,5.22%
+Cassandra,"UNLOGGED batch, reader ONE",4876,18526,1807,9.75%
